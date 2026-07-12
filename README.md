@@ -1,6 +1,8 @@
 # 考研看板
 
-2027 考研进度追踪 + Obsidian 知识库同步。`hyh36.xyz/kanban/`。
+[GitHub: LidioMonkey/study-coach-kanban](https://github.com/LidioMonkey/study-coach-kanban)
+
+## Overview
 
 ## 功能
 
