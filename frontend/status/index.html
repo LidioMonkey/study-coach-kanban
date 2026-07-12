@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="zh"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Coach · 服务器状态</title>
+<style>
+:root {
+  --paper:#fffdf7; --ink:#1d241f; --muted:#6f7266; --line:rgba(29,36,31,.12);
+  --ok:#2f7d57; --warn:#b47a29; --err:#a4493d; --info:#345f8a;
+}
+* { box-sizing:border-box; }
+body { margin:0; padding:0; background:var(--paper); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif; }
+header {
+  padding:20px 24px; background:linear-gradient(135deg,#2f7d57 0%,#345f8a 100%);
+  color:#fffdf7; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+}
+header h1 { margin:0; font-size:20px; font-weight:800; }
+header .meta { font-size:12px; opacity:.85; }
+main { max-width:960px; margin:0 auto; padding:20px 16px 60px; }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media (max-width:640px){ .grid{ grid-template-columns:1fr; } }
+.card {
+  background:#fff; border:1px solid var(--line); border-radius:14px;
+  padding:16px 18px; box-shadow:0 2px 8px rgba(16,21,17,.05);
+}
+.card h2 { margin:0 0 12px; font-size:15px; display:flex; align-items:center; gap:8px; }
+.kv { display:grid; grid-template-columns:100px 1fr; gap:6px 12px; font-size:13px; }
+.kv .k { color:var(--muted); font-weight:600; }
+.kv .v { font-family:ui-monospace,"SF Mono",Menlo,monospace; word-break:break-all; }
+.badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:700; }
+.badge.ok { background:#d3ecdc; color:var(--ok); }
+.badge.err { background:#f6d7d1; color:var(--err); }
+.bar { height:8px; background:#eee5d0; border-radius:4px; overflow:hidden; margin-top:4px; }
+.bar > span { display:block; height:100%; background:linear-gradient(90deg,#2f7d57,#4a9d70); }
+.bar.warn > span { background:linear-gradient(90deg,#b47a29,#d1a64a); }
+.bar.err  > span { background:linear-gradient(90deg,#a4493d,#c47a6f); }
+.logs {
+  background:#111614; color:#e8e0cc; font-family:ui-monospace,Menlo,monospace;
+  font-size:11.5px; line-height:1.55; padding:12px 14px; border-radius:10px;
+  max-height:360px; overflow:auto; white-space:pre-wrap; word-break:break-all;
+}
+.log-tabs { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+.log-tab {
+  padding:6px 12px; border-radius:999px; font-size:12px; font-weight:700;
+  background:#eee5d0; color:var(--muted); border:none; cursor:pointer;
+}
+.log-tab.active { background:linear-gradient(135deg,#2f7d57,#4a9d70); color:#fff; }
+.refresh-btn {
+  background:rgba(255,255,255,.18); color:#fff; border:1px solid rgba(255,255,255,.4);
+  padding:6px 14px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer;
+}
+.refresh-btn:hover { background:rgba(255,255,255,.28); }
+.refresh-btn:disabled { opacity:.55; cursor:not-allowed; }
+.sync-btn {
+  background:linear-gradient(135deg,#b47a29,#d1a64a); color:#fff; border:none;
+  padding:6px 14px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer;
+}
+.sync-btn:hover { filter:brightness(1.05); }
+.sync-btn:disabled { opacity:.55; cursor:not-allowed; }
+.hdr-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.spin { display:inline-block; width:10px; height:10px; border:2px solid #e8e0cc;
+  border-top-color:#2f7d57; border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.err-note { color:var(--err); font-size:12px; }
+.ok-note { color:var(--ok); font-size:12px; }
+.footer-links { margin-top:24px; text-align:center; font-size:13px; }
+.footer-links a { color:var(--info); margin:0 10px; }
+
+/* vault 浏览器 */
+.vault-toolbar { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
+.vault-toolbar input {
+  flex:1; min-width:180px; padding:7px 12px; border:1px solid var(--line);
+  border-radius:999px; font-size:13px; background:#fffdf7; color:var(--ink);
+  font-family:inherit;
+}
+.vault-toolbar input:focus { outline:none; border-color:var(--ok); }
+.vault-toolbar button {
+  padding:7px 14px; border-radius:999px; font-size:12px; font-weight:700;
+  background:#eee5d0; color:var(--muted); border:none; cursor:pointer;
+}
+.vault-toolbar button:hover { background:#e0d7c0; }
+.crumbs { font-size:12px; color:var(--muted); margin-bottom:8px; word-break:break-all; }
+.crumbs a { color:var(--info); cursor:pointer; text-decoration:none; }
+.crumbs a:hover { text-decoration:underline; }
+.crumbs .sep { margin:0 4px; opacity:.5; }
+.vault-list { max-height:340px; overflow:auto; border:1px solid var(--line);
+  border-radius:10px; background:#fffdf7; }
+.vault-list .row {
+  display:flex; align-items:center; gap:8px; padding:8px 12px;
+  border-bottom:1px solid var(--line); cursor:pointer; font-size:13px;
+}
+.vault-list .row:last-child { border-bottom:none; }
+.vault-list .row:hover { background:#f3ecd6; }
+.vault-list .icon { width:20px; text-align:center; }
+.vault-list .name { flex:1; font-weight:600; word-break:break-all; }
+.vault-list .meta { font-size:11px; color:var(--muted); font-family:ui-monospace,Menlo,monospace; white-space:nowrap; }
+.vault-list .empty { padding:16px; text-align:center; color:var(--muted); font-size:12.5px; }
+.vault-file-view {
+  margin-top:10px; background:#111614; color:#e8e0cc;
+  font-family:ui-monospace,Menlo,monospace; font-size:11.5px; line-height:1.55;
+  padding:12px 14px; border-radius:10px; max-height:400px; overflow:auto;
+  white-space:pre-wrap; word-break:break-all;
+}
+.vault-file-header {
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:12px; color:var(--muted); margin-top:10px; margin-bottom:4px;
+}
+.vault-file-header .close-btn {
+  background:none; border:1px solid var(--line); border-radius:999px;
+  padding:2px 10px; font-size:11px; cursor:pointer; color:var(--muted);
+}
+.hint-truncated { color:var(--warn); font-size:11px; margin-top:6px; }
+</style>
+</head><body>
+<header>
+  <div>
+    <h1>📊 Study Coach 服务器状态</h1>
+    <div class="meta" id="meta">加载中…</div>
+  </div>
+  <div class="hdr-actions">
+    <button class="sync-btn" id="syncBtn" onclick="triggerSync()">☁️ 立即从 OSS 拉取</button>
+    <button class="refresh-btn" onclick="loadAll()">🔄 刷新</button>
+  </div>
+</header>
+
+<main>
+  <div class="grid">
+    <div class="card">
+      <h2>🖥️ 系统资源</h2>
+      <div id="system">加载中…</div>
+    </div>
+    <div class="card">
+      <h2>⚙️ 服务状态</h2>
+      <div id="services">加载中…</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>📚 Obsidian Vault <span id="syncStatus" style="margin-left:8px;font-size:12px;font-weight:400;color:var(--muted)"></span></h2>
+    <div id="vault">加载中…</div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>🗂️ Vault 浏览与搜索</h2>
+    <div class="vault-toolbar">
+      <input type="search" id="searchInput" placeholder="搜文件夹或文件名（如 高数 / 660 / home）"
+             onkeydown="if(event.key==='Enter') doSearch()">
+      <button onclick="doSearch()">🔍 搜索</button>
+      <button onclick="clearSearch()">📂 浏览目录</button>
+    </div>
+    <div class="crumbs" id="crumbs"></div>
+    <div class="vault-list" id="vaultList">加载中…</div>
+    <div id="fileViewWrap" style="display:none">
+      <div class="vault-file-header">
+        <span id="fileViewTitle"></span>
+        <button class="close-btn" onclick="closeFile()">关闭</button>
+      </div>
+      <div class="vault-file-view" id="fileView"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2>📜 日志</h2>
+    <div class="log-tabs">
+      <button class="log-tab active" data-log="sync" onclick="loadLog('sync', this)">同步 sync.log</button>
+      <button class="log-tab" data-log="pull" onclick="loadLog('pull', this)">拉取 pull.log</button>
+      <button class="log-tab" data-log="api" onclick="loadLog('api', this)">API access.log</button>
+    </div>
+    <div class="logs" id="logs">选择日志类型…</div>
+  </div>
+
+  <div class="footer-links">
+    <a href="/">← 回看板首页</a>
+    <a href="/caldav/">📅 CalDAV</a>
+  </div>
+</main>
+
+<script>
+const T = "c3a01bf73127421047939d96fb44d383bf5cd659988d2c3f";
+
+async function api(path) {
+  const r = await fetch("/api/kanban" + path, { headers: { "X-Token": T } });
+  return r.json();
+}
+function fmtBytes(n) {
+  if (!n) return "0";
+  const u = ["B","KB","MB","GB","TB"];
+  let i = 0;
+  while (n >= 1024 && i < u.length - 1) { n /= 1024; i++; }
+  return n.toFixed(n >= 100 ? 0 : 1) + " " + u[i];
+}
+function fmtUptime(s) {
+  const d = Math.floor(s / 86400); s -= d * 86400;
+  const h = Math.floor(s / 3600); s -= h * 3600;
+  const m = Math.floor(s / 60);
+  return `${d}天 ${h}时 ${m}分`;
+}
+function fmtTs(t) {
+  if (!t) return "—";
+  const d = new Date(t * 1000);
+  return d.toLocaleString("zh-CN");
+}
+function bar(used, total, warnPct=70, errPct=90) {
+  const pct = Math.round(used / total * 100);
+  const cls = pct >= errPct ? "err" : pct >= warnPct ? "warn" : "";
+  return `<div class="bar ${cls}"><span style="width:${pct}%"></span></div>`;
+}
+
+async function loadSystem() {
+  const d = await api("/status/system");
+  if (!d.ok) { document.getElementById("system").innerHTML = '<span class="err-note">加载失败</span>'; return; }
+  const memPct = Math.round(d.mem_used_kb / d.mem_total_kb * 100);
+  const diskPct = Math.round(d.disk_root_used / d.disk_root_total * 100);
+  document.getElementById("system").innerHTML = `
+    <div class="kv">
+      <div class="k">主机名</div><div class="v">${d.hostname}</div>
+      <div class="k">当前时间</div><div class="v">${d.now} ${d.tz}</div>
+      <div class="k">运行时长</div><div class="v">${fmtUptime(d.uptime_seconds)}</div>
+      <div class="k">负载</div><div class="v">${d.load.join(" / ")} · ${d.cpu_count} 核</div>
+      <div class="k">内存</div><div class="v">${fmtBytes(d.mem_used_kb*1024)} / ${fmtBytes(d.mem_total_kb*1024)} (${memPct}%)${bar(d.mem_used_kb, d.mem_total_kb)}</div>
+      <div class="k">磁盘 /</div><div class="v">${fmtBytes(d.disk_root_used)} / ${fmtBytes(d.disk_root_total)} (${diskPct}%)${bar(d.disk_root_used, d.disk_root_total)}</div>
+    </div>
+  `;
+  document.getElementById("meta").textContent = `${d.hostname} · ${d.now}`;
+}
+
+async function loadServices() {
+  const d = await api("/status/services");
+  if (!d.ok) { document.getElementById("services").innerHTML = '<span class="err-note">加载失败</span>'; return; }
+  const svc = (name, ok, extra="") => `
+    <div class="k">${name}</div>
+    <div class="v">
+      <span class="badge ${ok ? 'ok' : 'err'}">${ok ? '✓ 运行' : '✗ 停止'}</span>
+      ${extra}
+    </div>`;
+  const api_ = d.study_coach_api;
+  const cron = d.cron_pull_last;
+  document.getElementById("services").innerHTML = `
+    <div class="kv">
+      ${svc("Study Coach API", api_.running && api_.port_8791, `pid ${api_.pid || '-'} · :8791`)}
+      ${svc("Nginx", d.nginx.active)}
+      ${svc("Radicale (CalDAV)", d.radicale.active && d.radicale.port_5232, ":5232")}
+      <div class="k">Cron 拉取</div>
+      <div class="v">
+        ${cron ? `<span class="badge ${cron.rc===0?'ok':'err'}">rc=${cron.rc}</span> ${cron.time}` : '无记录'}
+      </div>
+    </div>
+  `;
+}
+
+async function loadVault() {
+  const d = await api("/status/vault");
+  if (!d.ok) { document.getElementById("vault").innerHTML = '<span class="err-note">加载失败</span>'; return; }
+  document.getElementById("vault").innerHTML = `
+    <div class="kv">
+      <div class="k">路径</div><div class="v">${d.vault_root}</div>
+      <div class="k">文件数</div><div class="v">${d.file_count}</div>
+      <div class="k">总大小</div><div class="v">${fmtBytes(d.total_size)}</div>
+      <div class="k">最后修改</div><div class="v">${fmtTs(d.latest_mtime)}</div>
+      <div class="k">回收站</div><div class="v">${d.trash_count} 个文件</div>
+      <div class="k">备份数</div><div class="v">${d.backup_count} 份 · 最新：${d.latest_backup ? d.latest_backup.name + ' (' + fmtTs(d.latest_backup.mtime) + ')' : '无'}</div>
+    </div>
+  `;
+}
+
+async function loadLog(type, btn) {
+  document.querySelectorAll(".log-tab").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+  const el = document.getElementById("logs");
+  el.innerHTML = '<span class="spin"></span> 加载中...';
+  const d = await api("/status/logs?type=" + type + "&tail=120");
+  if (!d.ok || !d.exists) { el.textContent = "日志不存在或加载失败"; return; }
+  el.textContent = d.lines.length ? d.lines.join("\n") : "(空)";
+  el.scrollTop = el.scrollHeight;
+}
+
+async function loadAll() {
+  await Promise.all([loadSystem(), loadServices(), loadVault()]);
+  loadLog("sync", document.querySelector('.log-tab[data-log="sync"]'));
+  if (!currentPath && !isSearching) browsePath("");
+}
+
+// ---------- 立即从 OSS 拉取 ----------
+async function triggerSync() {
+  const btn = document.getElementById("syncBtn");
+  const st  = document.getElementById("syncStatus");
+  btn.disabled = true;
+  const oldText = btn.textContent;
+  btn.innerHTML = '<span class="spin"></span> 拉取中…';
+  st.textContent = "";
+  try {
+    const r = await fetch("/api/kanban/pull", {
+      method: "POST",
+      headers: { "X-Token": T, "Content-Type": "application/json" },
+      body: "{}",
+    });
+    const d = await r.json();
+    if (d.ok) {
+      st.innerHTML = `<span class="ok-note">✓ 拉取完成 rc=${d.rc}</span>`;
+    } else {
+      st.innerHTML = `<span class="err-note">✗ 失败 rc=${d.rc ?? '?'} ${d.error ?? ''}</span>`;
+    }
+  } catch (e) {
+    st.innerHTML = `<span class="err-note">✗ 请求失败: ${e.message}</span>`;
+  }
+  btn.disabled = false;
+  btn.textContent = oldText;
+  // 刷新 vault 概览和当前目录
+  loadVault();
+  if (isSearching && lastQuery) doSearch();
+  else browsePath(currentPath);
+  loadLog("pull", document.querySelector('.log-tab[data-log="pull"]'));
+  setTimeout(() => { st.textContent = ""; }, 6000);
+}
+
+// ---------- vault 浏览 / 搜索 / 读文件 ----------
+let currentPath = "";
+let isSearching = false;
+let lastQuery = "";
+
+async function browsePath(rel) {
+  isSearching = false;
+  currentPath = rel || "";
+  document.getElementById("searchInput").value = "";
+  const list = document.getElementById("vaultList");
+  list.innerHTML = '<div class="empty"><span class="spin"></span> 加载中…</div>';
+  const d = await api("/vault/browse?path=" + encodeURIComponent(currentPath));
+  if (!d.ok) {
+    list.innerHTML = `<div class="empty err-note">${d.error || '加载失败'}</div>`;
+    document.getElementById("crumbs").innerHTML = "";
+    return;
+  }
+  // 面包屑
+  const crumbs = document.getElementById("crumbs");
+  crumbs.innerHTML = d.crumbs.map((c, i) =>
+    `<a onclick="browsePath('${escAttr(c.rel_path)}')">${escHtml(c.name)}</a>` +
+    (i < d.crumbs.length - 1 ? '<span class="sep">/</span>' : '')
+  ).join("");
+  // 列表
+  renderList(list, [
+    ...d.dirs.map(x => ({ type:"dir", ...x })),
+    ...d.files.map(x => ({ type:"file", ...x })),
+  ]);
+}
+
+async function doSearch() {
+  const q = document.getElementById("searchInput").value.trim();
+  if (!q) { clearSearch(); return; }
+  isSearching = true;
+  lastQuery = q;
+  const list = document.getElementById("vaultList");
+  list.innerHTML = '<div class="empty"><span class="spin"></span> 搜索中…</div>';
+  const d = await api("/vault/search?limit=80&q=" + encodeURIComponent(q));
+  if (!d.ok) {
+    list.innerHTML = `<div class="empty err-note">${d.error || '搜索失败'}</div>`;
+    return;
+  }
+  document.getElementById("crumbs").innerHTML =
+    `搜索 <b>${escHtml(q)}</b> · 命中 ${d.count}${d.truncated ? '（已截断）' : ''}`;
+  if (!d.results.length) {
+    list.innerHTML = '<div class="empty">没匹配到，试试其它关键词</div>';
+    return;
+  }
+  renderList(list, d.results);
+}
+
+function clearSearch() {
+  document.getElementById("searchInput").value = "";
+  browsePath(currentPath || "");
+}
+
+function renderList(container, items) {
+  if (!items.length) {
+    container.innerHTML = '<div class="empty">（空目录）</div>';
+    return;
+  }
+  container.innerHTML = items.map(it => {
+    const icon = it.type === "dir" ? "📁" : (it.readable ? "📄" : "🔒");
+    const meta = it.type === "dir"
+      ? `${it.md_count ?? '?'} md · ${fmtTs(it.mtime)}`
+      : `${fmtBytes(it.size)} · ${fmtTs(it.mtime)}`;
+    const rel = escAttr(it.rel_path);
+    const handler = it.type === "dir"
+      ? `browsePath('${rel}')`
+      : (it.readable ? `openFile('${rel}')` : `alert('该文件类型不支持在浏览器内查看')`);
+    return `<div class="row" onclick="${handler}">
+      <div class="icon">${icon}</div>
+      <div class="name">${escHtml(it.name)} <span style="font-weight:400;color:var(--muted);font-size:11px">${escHtml(it.rel_path)}</span></div>
+      <div class="meta">${meta}</div>
+    </div>`;
+  }).join("");
+}
+
+async function openFile(rel) {
+  const wrap = document.getElementById("fileViewWrap");
+  const title = document.getElementById("fileViewTitle");
+  const view = document.getElementById("fileView");
+  wrap.style.display = "block";
+  title.textContent = "📄 " + rel;
+  view.innerHTML = '<span class="spin"></span> 加载中…';
+  const d = await api("/vault/file?path=" + encodeURIComponent(rel));
+  if (!d.ok) {
+    view.textContent = "加载失败：" + (d.error || "unknown");
+    return;
+  }
+  view.textContent = d.content || "(空)";
+  if (d.truncated) {
+    view.innerHTML += '\n\n<div class="hint-truncated">— 内容过大，已截断至 256KB —</div>';
+  }
+  wrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function closeFile() {
+  document.getElementById("fileViewWrap").style.display = "none";
+}
+
+function escHtml(s) {
+  return (s || "").replace(/[&<>"']/g, c => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function escAttr(s) {
+  return (s || "").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+}
+
+loadAll();
+setInterval(loadAll, 30000);
+</script>
+</body></html>

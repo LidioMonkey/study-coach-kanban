@@ -1,0 +1,2035 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2027 考研</title>
+<link rel="stylesheet" href="/vendor/katex/katex.min.css">
+<script defer src="/vendor/katex/katex.min.js"></script>
+<script src="/vendor/mermaid/mermaid.min.js"></script>
+<script>
+  // Mermaid 初始化：不自动扫全页（我们只在复习笔记展开时按需渲染），
+  // securityLevel:'loose' 允许标签里的中文/标点；theme 用 default 配我们的米色纸背景
+  document.addEventListener('DOMContentLoaded', () => {
+    if (window.mermaid) {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'default',
+        securityLevel: 'loose',
+        fontFamily: 'inherit',
+        flowchart: { htmlLabels: true, useMaxWidth: true },
+        gantt: { useMaxWidth: true },
+        sequence: { useMaxWidth: true },
+      });
+    }
+  });
+</script>
+<style>
+:root {
+  --ink:#18211c; --muted:#66736b; --paper:#f7f4ed; --panel:#fffdf7;
+  --line:#d9d1c3; --green:#2f7d57; --blue:#345f8a; --red:#a4493d;
+  --amber:#b47a29; --black:#101511;
+}
+* { box-sizing:border-box; }
+html, body { overscroll-behavior-y: none; }
+body {
+  margin:0; color:var(--ink); background:
+    linear-gradient(90deg, rgba(16,21,17,.045) 1px, transparent 1px) 0 0/28px 28px,
+    linear-gradient(rgba(16,21,17,.035) 1px, transparent 1px) 0 0/28px 28px,
+    var(--paper);
+  font-family: "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+header {
+  padding:16px clamp(14px,2.4vw,32px);
+  border-bottom:1px solid rgba(16,21,17,.35);
+  background:var(--paper);
+}
+.hero {
+  position:relative; padding:24px clamp(22px,3.2vw,42px) 20px;
+  background:
+    linear-gradient(90deg, rgba(16,21,17,.04) 1px, transparent 1px) 0 0/80px 60px,
+    radial-gradient(circle at 75% 18%, rgba(209,166,74,.12), transparent 32%),
+    var(--paper);
+  box-shadow:0 18px 36px rgba(16,21,17,.08);
+  border-radius:0 0 14px 14px;
+}
+.hero { position:relative; }
+.hero-head {
+  display:flex; align-items:flex-end; justify-content:flex-start;
+  gap:36px; flex-wrap:wrap;
+}
+.hero-title { flex:0 0 auto; }
+.hero-title .sub { margin:0 0 4px; }
+.hero-title h1 {
+  margin:0; font-size:clamp(56px,8vw,104px); line-height:.9; font-weight:900;
+}
+.hero-head .countdown { margin-top:0; flex:0 0 auto; align-items:flex-start; }
+.stage-pill {
+  position:absolute; top:14px; right:16px;
+  display:inline-flex; align-items:center; gap:8px;
+  padding:6px 12px; border-radius:999px;
+  background:linear-gradient(135deg, #315f43, #3a6b47); color:var(--paper);
+  font-weight:800; font-size:12px; letter-spacing:.5px;
+  box-shadow:0 4px 10px rgba(49,95,67,.25);
+  z-index:2;
+}
+.stage-pill .stage-ico { font-size:14px; }
+.stage-pill .stage-sub { opacity:.75; font-weight:600; font-size:10px; margin-left:3px; }
+@media (max-width: 720px) {
+  .hero-head { align-items:flex-start; gap:14px; }
+  .hero-head .countdown { flex-basis:100%; }
+  .hero-title h1 { font-size:clamp(48px,10vw,72px); }
+}
+.hero .sub { color:var(--muted); font-size:14px; }
+.quote-card {
+  background:linear-gradient(180deg,#fffdf7 0%, #fbf5e9 100%);
+  border-left:4px solid var(--amber); padding:12px 18px; border-radius:0 8px 8px 0;
+  font-size:14px; line-height:1.55; color:var(--ink);
+  box-shadow:0 4px 10px rgba(16,21,17,.06);
+  margin-top:16px;
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.quote-card .quote-lbl {
+  font-size:11px; color:var(--muted); font-weight:800; letter-spacing:.8px;
+  text-transform:uppercase; white-space:nowrap;
+  padding-right:14px; border-right:1px solid rgba(29,36,31,.15);
+}
+.quote-card .quote-text {
+  font-weight:600; font-size:15px; flex:1; min-width:200px;
+}
+.quote-card.empty { opacity:.6; }
+.hero .sub { color:var(--muted); font-size:14px; }
+.countdown { display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin-top:8px; }
+.cd-days-line {
+  font-size:12px; font-weight:700; color:var(--muted);
+  letter-spacing:.5px;
+}
+.cd-days-line .cd-days-num {
+  font-size:clamp(20px,2.4vw,26px); font-weight:900; color:var(--ink); margin:0 4px;
+}
+.cd-hms { display:flex; gap:8px; }
+.cd-block {
+  background:var(--black); color:var(--paper); padding:10px 16px; border-radius:6px;
+  text-align:center; min-width:72px;
+}
+.cd-block .cd-num { font-size:clamp(32px,5vw,54px); font-weight:900; line-height:1; color:var(--paper); font-variant-numeric:tabular-nums; }
+.cd-block .cd-lbl { font-size:10px; opacity:.7; margin-top:4px; color:var(--paper); }
+.stats-row { display:flex; gap:24px; flex-wrap:wrap; margin-top:20px; }
+.stat { min-width:90px; }
+.stat .val { font-size:clamp(32px,4vw,48px); line-height:.86; font-weight:900; }
+.stat .lbl { color:var(--muted); font-size:12px; margin-top:6px; }
+main { padding:24px clamp(18px,2.4vw,40px) 48px; }
+.card {
+  background:linear-gradient(180deg, #fffdf8 0%, #fbf6ec 100%);
+  border:1px solid rgba(29,36,31,.55); padding:16px; box-shadow:0 10px 24px rgba(16,21,17,.08);
+  border-radius:8px; margin-bottom:16px;
+}
+.card h2 { margin:0 0 12px; font-size:18px; }
+.subject-grid { display:grid; gap:14px; }
+.subject-card {
+  position:relative; padding:18px 18px 18px 28px;
+  background:linear-gradient(180deg,#fffdfa 0%,#fbf5e9 100%);
+  border:1px solid rgba(29,36,31,.55); border-radius:8px;
+  box-shadow:0 10px 24px rgba(16,21,17,.08);
+}
+.subject-card::before {
+  content:""; position:absolute; left:0; top:12px; bottom:12px; width:5px;
+  background:linear-gradient(180deg,#315f43,#d1a64a); opacity:.9; border-radius:0 3px 3px 0;
+}
+.subject-card h2 { font-size:22px; margin:0 0 14px; display:flex; justify-content:space-between; }
+.books-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:12px; }
+.book {
+  border:1px solid #ded3c4; background:#fffdfa; border-radius:8px; padding:12px;
+}
+.book h3 { font-size:15px; margin:0 0 8px; display:flex; justify-content:space-between; }
+.bar { height:8px; border:1px solid rgba(29,36,31,.5); background:#eee2cf; overflow:hidden; margin:8px 0; border-radius:999px; }
+.bar > i { display:block; height:100%; background:linear-gradient(90deg, #3f6f4a, #88a95e); }
+.chapters { display:flex; flex-wrap:wrap; gap:3px; margin-top:6px; }
+.chapter-dot {
+  width:16px; height:16px; border-radius:4px; border:1px solid rgba(29,36,31,.12);
+  background:#eee3d1; cursor:default; position:relative;
+}
+.chapter-dot.done { background:#cfe1cf; border-color:#8daf92; }
+.chapter-dot:hover::after {
+  content:attr(data-title); position:absolute; bottom:22px; left:50%; transform:translateX(-50%);
+  background:var(--black); color:var(--paper); padding:4px 8px; font-size:11px;
+  white-space:nowrap; border-radius:4px; z-index:10;
+}
+.muted { color:var(--muted); font-size:12px; }
+.pill {
+  display:inline-flex; align-items:center; border:1px solid rgba(29,36,31,.55);
+  padding:4px 7px; margin:2px; font-size:12px; font-weight:800; background:#efe3c8; border-radius:999px;
+}
+.pill.green { background:#d6e6d6; }
+.pill.red { background:#ecd0c8; }
+.pill.blue { background:#d4e2ef; }
+.task-list { list-style:none; padding:0; margin:0; }
+.task-list li {
+  display:flex; align-items:center; gap:12px; padding:12px 0;
+  border-bottom:1px dashed rgba(29,36,31,.15);
+}
+.task-list li:last-child { border-bottom:none; }
+.task-card { background:linear-gradient(180deg,#fffdfa 0%,#fbf5e9 100%); border:1px solid rgba(29,36,31,.55); border-radius:8px; padding:16px; margin-bottom:12px; box-shadow:0 10px 24px rgba(16,21,17,.08); }
+
+/* 今日任务：桌面四栏（4科并排），中等屏双栏，手机单列 */
+#taskList {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  align-items:stretch;
+}
+@media (min-width:760px) and (max-width:1099px) {
+  #taskList { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width:1100px) {
+  #taskList { grid-template-columns:repeat(4, minmax(0, 1fr)); gap:10px; }
+}
+#taskList > .task-card {
+  margin-bottom:0;
+  display:flex; flex-direction:column;
+  padding:14px 12px;
+}
+/* 日期行独占整行 */
+#taskList > .task-date-row { grid-column:1 / -1; }
+
+/* 教材分组折叠 */
+.book-group-title { cursor:pointer; user-select:none; }
+.book-group-title .book-toggle {
+  display:inline-block; width:14px; text-align:center;
+  transition: transform .2s ease; font-size:10px; opacity:.75;
+}
+.book-group.collapsed .book-toggle { transform: rotate(-90deg); }
+.book-group.collapsed .task-list { display:none; }
+.subject-progress-hero {
+  display:flex; align-items:baseline; gap:4px;
+  margin-left:auto; font-weight:700;
+}
+.subject-progress-hero .hero-done {
+  font-size:20px; line-height:1;
+}
+.subject-progress-hero .hero-sep {
+  color:var(--muted); font-size:14px; font-weight:500;
+}
+.subject-progress-hero .hero-total {
+  font-size:13px; color:var(--muted); font-weight:600;
+}
+
+/* 「今日」区 + 「教材」区分层 */
+.subject-section-label {
+  font-size:10px; font-weight:800; letter-spacing:1px;
+  color:var(--muted); text-transform:uppercase;
+  margin:10px 0 6px 0; padding-bottom:3px;
+  border-bottom:1px dashed rgba(29,36,31,.15);
+  display:flex; align-items:center; gap:6px;
+}
+.subject-section-label:first-child { margin-top:0; }
+.subject-empty-today {
+  font-size:12px; color:var(--muted); font-style:italic;
+  padding:4px 0 6px 0;
+}
+/* 全部教材：可折叠 */
+.all-books-wrap.collapsed .book-status-list { display:none; }
+.subject-section-label.toggle {
+  cursor:pointer; user-select:none;
+  transition: color .15s ease;
+}
+.subject-section-label.toggle:hover { color:#4a463d; }
+.subject-section-label.toggle .section-arrow {
+  display:inline-flex; width:14px; text-align:center;
+  font-size:10px; color:var(--muted);
+}
+/* collapsed 时 JS 已切换字符 ▶/▼，不用 rotate 避免视觉方向不一致 */
+/* 全部教材行 */
+.book-status-list { display:flex; flex-direction:column; gap:4px; }
+.book-status-row {
+  display:flex; align-items:center; gap:6px;
+  padding:5px 8px; border-radius:6px;
+  font-size:12px; line-height:1.3;
+  background:rgba(255,255,255,.5);
+  border:1px solid rgba(29,36,31,.08);
+}
+.book-status-row .bs-icon {
+  flex-shrink:0; font-size:12px; width:14px; text-align:center;
+}
+.book-status-row .bs-name {
+  flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font-weight:500;
+}
+.book-status-row .bs-count {
+  flex-shrink:0; font-size:10px; font-weight:700;
+  color:var(--muted); letter-spacing:.3px;
+}
+.book-status-row.bs-done { background:rgba(47,125,87,.08); border-color:rgba(47,125,87,.2); }
+.book-status-row.bs-done .bs-name { color:#2f7d57; text-decoration:line-through; opacity:.7; }
+.book-status-row.bs-doing { background:rgba(180,122,41,.06); border-color:rgba(180,122,41,.18); }
+.book-status-row.bs-doing .bs-name { color:#7a5416; font-weight:600; }
+.book-status-row.bs-todo { opacity:.75; }
+.book-status-row.bs-todo .bs-name { color:var(--muted); }
+.book-status-row .bs-mini-bar {
+  width:26px; height:3px; border-radius:3px;
+  background:rgba(29,36,31,.1); position:relative; flex-shrink:0;
+}
+.book-status-row .bs-mini-bar > i {
+  position:absolute; left:0; top:0; height:100%;
+  background:currentColor; border-radius:3px; opacity:.55;
+}
+nav.tabs {
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; margin-bottom:20px;
+  background:#efe7d5; padding:3px; border-radius:12px;
+  border:1px solid rgba(29,36,31,.15);
+  box-shadow:inset 0 2px 4px rgba(16,21,17,.06);
+  position:relative;
+}
+nav.tabs button {
+  border:none; background:transparent; padding:7px 4px; cursor:pointer;
+  font-weight:700; font-size:12px; color:var(--muted); border-radius:8px;
+  display:inline-flex; align-items:center; justify-content:center; gap:4px;
+  transition: all .28s cubic-bezier(.4,0,.2,1);
+  font-family:inherit; letter-spacing:.1px;
+  min-height:34px; min-width:0; overflow:hidden; white-space:nowrap;
+}
+nav.tabs button:active { transform:scale(.97); }
+nav.tabs button.active {
+  background:linear-gradient(135deg, #2f7d57 0%, #4a9d70 100%);
+  color:#fffdf7;
+  box-shadow:0 3px 10px rgba(47,125,87,.35), inset 0 1px 0 rgba(255,255,255,.25);
+}
+nav.tabs button .tab-icon { font-size:13px; }
+nav.tabs button.active .tab-count {
+  background:rgba(255,255,255,.28); padding:1px 6px; border-radius:999px;
+  font-size:10px; font-weight:800; margin-left:1px;
+}
+nav.tabs button:not(.active) .tab-count {
+  background:rgba(29,36,31,.12); padding:1px 6px; border-radius:999px;
+  font-size:10px; font-weight:800; margin-left:1px; color:var(--muted);
+}
+@media (max-width:380px){
+  nav.tabs button { font-size:11px; padding:6px 3px; gap:3px; }
+  nav.tabs button .tab-icon { font-size:12px; }
+  nav.tabs button .tab-count { font-size:9px; padding:1px 5px; }
+}
+.task-check {
+  width:26px; height:26px; border:2px solid #b8ad9c; border-radius:8px;
+  cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:900; background:#fffdf7;
+  transition: all .2s ease;
+  box-shadow:0 1px 2px rgba(16,21,17,.06);
+}
+.task-check:hover { border-color:var(--green); transform:scale(1.08); }
+.task-check:active { transform:scale(.92); }
+.task-check.done {
+  background:linear-gradient(135deg, #2f7d57 0%, #4a9d70 100%);
+  border-color:#2f7d57; color:#fff;
+  box-shadow:0 3px 8px rgba(47,125,87,.35);
+}
+.task-list li { transition: opacity .2s ease; }
+.task-list li.is-done { opacity:.55; }
+.task-list li.is-done .task-title { text-decoration:line-through; }
+/* 未同步（pending）视觉 —— 虚线蓝框 */
+.task-check.pending {
+  border-style:dashed !important; border-color:#345f8a !important;
+  box-shadow:0 0 0 3px rgba(52,95,138,.12);
+}
+.task-check.pending.done { background:#d1dff0; color:#345f8a; }
+.task-check.pending:not(.done) { background:#fffdf7; }
+
+/* 章节 tag：任务行右侧灰色小胶囊，标记题目所属章 */
+.task-chapter-tag {
+  flex-shrink:0;
+  font-size:10px;
+  font-weight:600;
+  color:#6d6b64;
+  background:rgba(29,36,31,.06);
+  border:1px solid rgba(29,36,31,.12);
+  padding:1px 6px;
+  border-radius:8px;
+  line-height:1.4;
+  white-space:nowrap;
+  /* 不用 max-width / ellipsis：tag 内容不可截断，主标题让位 */
+}
+.is-done .task-chapter-tag { opacity:.55; }
+/* 右下角悬浮控制器 */
+.fab-wrap {
+  position:fixed; right:14px; bottom:14px; z-index:1000;
+  display:flex; flex-direction:column; align-items:flex-end; gap:8px;
+  font-family:inherit;
+}
+.fab-btn {
+  min-width:40px; height:40px; padding:0 12px; border-radius:20px;
+  border:none; background:linear-gradient(135deg, #2f7d57 0%, #4a9d70 100%);
+  color:#fffdf7; font-weight:700; font-size:12.5px; cursor:pointer;
+  box-shadow:0 4px 12px rgba(16,21,17,.20), 0 1px 3px rgba(16,21,17,.12);
+  display:inline-flex; align-items:center; justify-content:center; gap:5px;
+  transition: transform .18s ease, box-shadow .18s ease, background .2s, opacity .2s;
+}
+.fab-btn:hover { transform:translateY(-1px); box-shadow:0 8px 18px rgba(16,21,17,.26); }
+.fab-btn:active { transform:translateY(0); }
+.fab-btn:disabled { opacity:.6; cursor:not-allowed; }
+.fab-btn.pull { background:linear-gradient(135deg, #345f8a 0%, #5a83b0 100%); }
+.fab-btn.sync-alert { background:linear-gradient(135deg, #b47a29 0%, #d1a64a 100%); }
+.fab-btn.icon-only { min-width:40px; width:40px; padding:0; }
+.fab-badge {
+  background:rgba(255,255,255,.28); color:#fff; padding:1px 6px; border-radius:999px;
+  font-size:10px; font-weight:800; margin-left:2px;
+}
+.fab-status {
+  background:#fffdf7; color:var(--muted); border:1px solid rgba(29,36,31,.15);
+  padding:5px 10px; border-radius:12px; font-size:11px; font-weight:600;
+  box-shadow:0 3px 10px rgba(16,21,17,.08);
+  max-width:220px; text-align:right;
+}
+.fab-status.ok { color:#2f7d57; }
+.fab-status.err { color:#a4493d; }
+.fab-status.spin::before {
+  content:""; display:inline-block; width:9px; height:9px; margin-right:5px;
+  border:2px solid #b8ad9c; border-top-color:#2f7d57; border-radius:50%;
+  animation:fab-spin .8s linear infinite; vertical-align:-1px;
+}
+@keyframes fab-spin { to { transform:rotate(360deg); } }
+/* 折叠面板：默认收起，menu.open 时打开 */
+.fab-actions {
+  display:none; flex-direction:column; align-items:flex-end; gap:8px;
+}
+.fab-actions.open { display:flex; animation: fab-slide-in .2s ease; }
+@keyframes fab-slide-in {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.fab-menu {
+  background:#fffdf7; border:1px solid rgba(29,36,31,.15); border-radius:12px;
+  padding:6px 10px; font-size:12px; box-shadow:0 4px 12px rgba(16,21,17,.12);
+  display:flex; align-items:center; gap:8px; user-select:none;
+}
+.fab-menu label { cursor:pointer; display:flex; align-items:center; gap:5px; }
+.fab-menu input[type=checkbox] { accent-color:#2f7d57; width:14px; height:14px; }
+.fab-toast {
+  position:fixed; left:50%; bottom:100px; transform:translateX(-50%);
+  background:var(--black); color:var(--paper); padding:10px 18px; border-radius:8px;
+  font-size:13px; box-shadow:0 10px 28px rgba(16,21,17,.35);
+  opacity:0; pointer-events:none; transition: opacity .25s ease, bottom .25s ease;
+  z-index:1001; max-width:80vw; text-align:center;
+}
+.fab-toast.show { opacity:1; bottom:120px; }
+.fab-toast.err { background:#a4493d; }
+.fab-toast.ok { background:#2f7d57; }
+@media (max-width:480px){
+  .fab-wrap { right:10px; bottom:10px; gap:6px; }
+  .fab-btn { height:36px; min-width:36px; padding:0 10px; font-size:11.5px; }
+  .fab-btn.icon-only { width:36px; min-width:36px; }
+  .fab-status { font-size:10.5px; padding:4px 8px; }
+}
+/* 复习面板 */
+.review-section-title {
+  display:flex; align-items:center; gap:8px; margin:20px 0 12px;
+  font-size:14px; font-weight:800; color:var(--ink);
+  padding-bottom:8px; border-bottom:2px solid rgba(29,36,31,.15);
+}
+.review-section-title:first-child { margin-top:0; }
+.review-section-title .count-badge {
+  background:var(--green); color:#fff; padding:2px 10px; border-radius:999px;
+  font-size:12px; font-weight:800; margin-left:auto;
+}
+.review-section-title.overdue .count-badge { background:#a4493d; }
+.review-item {
+  display:flex; align-items:center; gap:12px; padding:12px;
+  background:#fffdf7; border:1px solid rgba(29,36,31,.12); border-radius:10px;
+  margin-bottom:8px; transition: all .2s ease;
+}
+.review-item:hover { border-color:rgba(29,36,31,.3); transform:translateX(2px); }
+.review-item.overdue { border-left:3px solid #a4493d; background:#fef4f2; }
+
+/* 复习条目：单栏布局（展开就地下推，不再跳整行）
+   注：以前是 repeat(2, 1fr) 但展开会跳整行错乱，改回单栏 */
+.review-grid {
+  display:grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap:8px 12px;
+}
+.review-grid > .review-item-wrap { min-width:0; }
+
+/* 内联的 D 徽章（放到标题旁，代替左侧大方块） */
+.review-badge-stage {
+  display:inline-flex; align-items:center; gap:3px;
+  padding:2px 8px; border-radius:999px;
+  font-size:11px; font-weight:800; line-height:1.4;
+  vertical-align:middle; margin-right:6px;
+}
+.review-badge-stage.D1 { background:#f5d8d2; color:#a4493d; }
+.review-badge-stage.D3 { background:#f2e2b8; color:#b47a29; }
+.review-badge-stage.D7 { background:#d1dff0; color:#345f8a; }
+.review-badge-stage.D15 { background:#cde3d3; color:#2f7d57; }
+.review-badge-stage.D30 { background:#dcd0f0; color:#5c4a8f; }
+
+/* 折叠按钮：信息胶囊风格（含下一节点提示） */
+.review-expand-btn {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:5px 10px; border-radius:14px;
+  background:rgba(29,36,31,.06);
+  color:#6b5f42; font-size:11px; font-weight:600; line-height:1.2;
+  cursor:pointer; user-select:none; flex-shrink:0;
+  transition: all .18s ease;
+  min-height:28px; white-space:nowrap;
+}
+.review-expand-btn .expand-arrow {
+  font-size:9px; opacity:.75; transition: transform .2s ease;
+  display:inline-block;
+}
+.review-expand-btn:hover {
+  background:rgba(29,36,31,.11);
+  color:#3a3020;
+}
+.review-expand-btn.open {
+  background:rgba(47,125,87,.13);
+  color:#2f7d57;
+}
+.review-expand-btn.open .expand-arrow {
+  transform: rotate(90deg);
+}
+.review-expand-btn.overdue-hint {
+  background:rgba(164,73,61,.12);
+  color:#a4493d;
+}
+.review-expand-btn.final-hint {
+  background:rgba(92,74,143,.12);
+  color:#5c4a8f;
+}
+
+/* 展开的笔记容器：防止内容撑开外层（尤其手机端） */
+.review-item-wrap { min-width:0; }
+.review-item-wrap > div[id^="note-"],
+.review-item-wrap > div[id^="note-"] * {
+  max-width:100%; box-sizing:border-box;
+  overflow-wrap:anywhere; word-break:break-word;
+}
+/* 笔记预览折叠：默认限高 400px + 底部渐变遮罩；点「展开全部」去掉限制 */
+.note-clip { position:relative; }
+.note-clip.clipped { max-height:400px; overflow:hidden; }
+.note-clip.clipped::after {
+  content:""; position:absolute; left:0; right:0; bottom:0; height:64px;
+  background:linear-gradient(to bottom, rgba(250,247,242,0), #faf7f2 90%);
+  pointer-events:none;
+}
+.note-expand-btn {
+  display:block; width:100%; margin-top:10px;
+  padding:8px 12px; background:#fff; border:1px solid #d9d1c3; border-radius:6px;
+  color:var(--ink); font-size:12px; font-weight:600; cursor:pointer;
+  transition:background .15s;
+}
+.note-expand-btn:hover { background:#f2ede0; }
+/* 代码块允许横滑但不撑开外层 */
+.review-item-wrap > div[id^="note-"] pre {
+  max-width:100%; overflow-x:auto;
+  white-space:pre; word-break:normal; overflow-wrap:normal;
+}
+.review-item-wrap > div[id^="note-"] img { height:auto; }
+/* 表格保持 display:table 才能让内部 tr/td 参与 table 布局并撑满 width:100%；
+   宽表横滑由外层包裹容器承担（.note-table-wrap），不能把 <table> 本身 block 化，
+   否则内部单元格只按内容宽度展开，右侧出现大片空白（2026-07-08 修） */
+.review-item-wrap > div[id^="note-"] .note-table-wrap { max-width:100%; overflow-x:auto; }
+.review-item-wrap > div[id^="note-"] table { width:100%; table-layout:auto; }
+/* KaTeX 块公式（display 模式）在窄屏遇到长公式会撑破卡片——限制最大宽度并允许横滑。
+   .katex-display 是 KaTeX 的外层块级容器，.katex-html 是内层 span；两层都要防溢出。
+   （2026-07-08 修：拉格朗日中值定理那行长公式撑破外层的问题） */
+.review-item-wrap > div[id^="note-"] .katex-display {
+  max-width:100%; overflow-x:auto; overflow-y:hidden;
+  padding-bottom:4px; /* 给横向滚动条留地 */
+}
+.review-item-wrap > div[id^="note-"] .katex-display > .katex { max-width:none; }
+.review-stage {
+  min-width:44px; text-align:center; padding:6px 8px; border-radius:8px;
+  font-size:12px; font-weight:800; line-height:1.2;
+}
+.review-stage-D1 { background:#f5d8d2; color:#a4493d; }
+.review-stage-D3 { background:#f2e2b8; color:#b47a29; }
+.review-stage-D7 { background:#d1dff0; color:#345f8a; }
+.review-stage-D15 { background:#cde3d3; color:#2f7d57; }
+.review-stage-D30 { background:#dcd0f0; color:#5c4a8f; }
+.review-day-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px; background:rgba(29,36,31,.04); border-radius:8px;
+  margin-bottom:6px; cursor:pointer; user-select:none;
+  transition: background .2s;
+}
+.review-day-header:hover { background:rgba(29,36,31,.08); }
+.review-day-header.high-load { background:#faecec; }
+.review-day-body { padding:8px 0 8px 12px; margin-bottom:12px; display:none; }
+.review-day-body.expanded { display:block; }
+.review-day-body .review-item { background:#fbf6ec; margin-bottom:6px; padding:8px 12px; }
+.review-empty {
+  text-align:center; padding:32px 20px; color:var(--muted);
+}
+.review-empty-icon { font-size:44px; margin-bottom:10px; }
+.review-stats {
+  display:flex; gap:16px; padding:14px 16px; background:#efe7d5;
+  border-radius:10px; margin-top:16px; font-size:13px;
+}
+.review-stats .stat-item { display:flex; align-items:center; gap:6px; }
+.review-stats b { color:var(--ink); font-weight:800; }
+#loading { text-align:center; padding:60px; color:var(--muted); font-size:18px; }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+</style>
+</head>
+<body>
+<header>
+  <div class="hero">
+    <div class="stage-pill" id="stagePill"><span class="stage-ico">📖</span><span id="stageName">加载中</span></div>
+    <div class="hero-head">
+      <div class="hero-title">
+        <div class="sub">22408 · 12月20日</div>
+        <h1>2027 考研</h1>
+      </div>
+      <div class="countdown" id="countdown"></div>
+    </div>
+    <div class="stats-row" id="overview"></div>
+    <div class="quote-card empty" id="quoteCard">
+      <div class="quote-lbl">✨ 每日寄语</div>
+      <div class="quote-text" id="quoteText">加载中...</div>
+    </div>
+  </div>
+</header>
+<main>
+  <nav class="tabs">
+    <button class="active" data-tab="tasks" onclick="switchTab('tasks')"><span class="tab-icon">📋</span>今日任务<span class="tab-count" id="tab-count-tasks">·</span></button>
+    <button data-tab="reviews" onclick="switchTab('reviews')"><span class="tab-icon">🔁</span>复习<span class="tab-count" id="tab-count-reviews">·</span></button>
+    <button data-tab="progress" onclick="switchTab('progress')"><span class="tab-icon">📊</span>进度<span class="tab-count" id="tab-count-progress">·</span></button>
+  </nav>
+  <div id="loading">加载中...</div>
+  <div class="tab-content active" id="tab-tasks"><div class="card"><h2>今日学习任务</h2><div id="taskList"><span class="muted">加载中...</span></div></div></div>
+  <div class="tab-content" id="tab-reviews"><div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+      <h2 style="margin:0">🔁 复习清单</h2>
+      <button class="btn-primary" onclick="openAddReviewModal()" style="padding:6px 14px;font-size:13px;background:#3a6b47;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">➕ 登记复习</button>
+    </div>
+    <div id="reviewList"><span class="muted">加载中...</span></div>
+  </div></div>
+  <div class="tab-content" id="tab-progress"><div id="subjects"></div></div>
+</main>
+
+<!-- 右下角悬浮同步控制器：默认只显示齿轮+状态；点齿轮展开拉取/同步/菜单 -->
+<div class="fab-wrap" id="fabWrap">
+  <div class="fab-status" id="fabStatus">✅ 已同步</div>
+  <div class="fab-actions" id="fabActions">
+    <div class="fab-menu" id="fabMenu">
+      <label><input type="checkbox" id="autoSyncToggle" checked>自动同步</label>
+    </div>
+    <button class="fab-btn pull" id="pullBtn" onclick="doPull()" title="从 OSS 拉最新">
+      <span style="font-size:15px">⬇️</span><span>拉取</span>
+    </button>
+    <button class="fab-btn" id="syncBtn" onclick="doSync()" title="推送本地改动到 OSS">
+      <span style="font-size:15px">⬆️</span><span>同步</span><span class="fab-badge" id="syncBadge" style="display:none">0</span>
+    </button>
+  </div>
+  <button class="fab-btn icon-only" id="menuBtn" onclick="toggleFabMenu()" title="设置">
+    <span style="font-size:16px">⚙️</span>
+  </button>
+</div>
+<div class="fab-toast" id="fabToast"></div>
+<script>
+const API = "/api/kanban";
+const API_TOKEN = "c3a01bf73127421047939d96fb44d383bf5cd659988d2c3f";
+const DEADLINE = new Date("2026-12-20T00:00:00+08:00");
+let allBooks = [];
+let bookConfig = { active: {} };  // 看板自管理：{ 进度文件名: limit }
+async function loadBookConfig() {
+  try {
+    const r = await fetch(API + "/book-config");
+    const d = await r.json();
+    if (d.ok) bookConfig = { active: d.active || {} };
+  } catch(_) { bookConfig = { active: {} }; }
+}
+async function toggleBookActive(name, active, limit) {
+  const btn = document.querySelector(`[data-book-toggle="${CSS.escape(name)}"]`);
+  if (btn) { btn.disabled = true; btn.style.opacity = .5; }
+  try {
+    const r = await fetch(API + "/book-config", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Token": API_TOKEN },
+      body: JSON.stringify({ name, active, limit: limit || 5 })
+    });
+    const d = await r.json();
+    if (d.ok) bookConfig = { active: d.active || {} };
+    else alert("失败: " + (d.error || "未知"));
+  } catch(e) { alert("网络错误: " + e.message); }
+  await renderTasks();
+}
+// ====== Pending 系统 ======
+const PENDING_KEY = "study-pending-v2";
+const AUTO_SYNC_KEY = "study-auto-sync";
+let pendingMap = JSON.parse(localStorage.getItem(PENDING_KEY) || "{}");   // key: {file,line,done,expected,ts}
+let syncing = false, pullingNow = false, autoSyncFails = 0;
+let autoDebounceT = null;
+
+function savePending() { localStorage.setItem(PENDING_KEY, JSON.stringify(pendingMap)); }
+function pendingCount() { return Object.keys(pendingMap).length; }
+function isAutoOn() { return localStorage.getItem(AUTO_SYNC_KEY) !== "off"; }
+function setAuto(on) { localStorage.setItem(AUTO_SYNC_KEY, on ? "on" : "off"); }
+
+function toast(msg, type="") {
+  const el = document.getElementById("fabToast");
+  el.className = "fab-toast show " + type;
+  el.textContent = msg;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove("show"), 3200);
+}
+
+function setFabStatus(text, cls="") {
+  const el = document.getElementById("fabStatus");
+  if (!el) return;
+  el.textContent = text;
+  el.className = "fab-status " + cls;
+}
+function renderFab() {
+  const cnt = pendingCount();
+  const badge = document.getElementById("syncBadge");
+  const btn = document.getElementById("syncBtn");
+  if (cnt > 0) {
+    badge.textContent = cnt; badge.style.display = "";
+    btn.classList.add("sync-alert");
+    if (!syncing) setFabStatus(`⚠️ ${cnt} 条待同步`, "err");
+  } else {
+    badge.style.display = "none";
+    btn.classList.remove("sync-alert");
+    if (!syncing && !pullingNow) setFabStatus("✅ 已同步", "ok");
+  }
+}
+function toggleFabMenu() {
+  const a = document.getElementById("fabActions");
+  const btn = document.getElementById("menuBtn");
+  if (!a) return;
+  const open = a.classList.toggle("open");
+  // 齿轮打开时轻微旋转+变色提示
+  btn.style.background = open ? "linear-gradient(135deg,#a4493d 0%,#c56a5d 100%)" : "";
+  btn.querySelector("span").style.transform = open ? "rotate(90deg)" : "";
+  btn.querySelector("span").style.transition = "transform .2s";
+}
+// 点面板外区域自动收起
+document.addEventListener("click", (e) => {
+  const wrap = document.getElementById("fabWrap");
+  const a = document.getElementById("fabActions");
+  if (!wrap || !a || !a.classList.contains("open")) return;
+  if (!wrap.contains(e.target)) {
+    a.classList.remove("open");
+    const btn = document.getElementById("menuBtn");
+    if (btn) {
+      btn.style.background = "";
+      const sp = btn.querySelector("span");
+      if (sp) sp.style.transform = "";
+    }
+  }
+});
+document.addEventListener("DOMContentLoaded", () => {
+  const cb = document.getElementById("autoSyncToggle");
+  if (cb) {
+    cb.checked = isAutoOn();
+    cb.addEventListener("change", () => setAuto(cb.checked));
+  }
+});
+
+
+// Countdown
+function updateCountdown() {
+  const now = new Date();
+  const diff = DEADLINE - now;
+  if (diff <= 0) { document.getElementById("countdown").innerHTML = '<div class="cd-days-line">🎉 考试日</div>'; return; }
+  const d = Math.floor(diff / 86400000);
+  const h = Math.floor((diff % 86400000) / 3600000);
+  const m = Math.floor((diff % 3600000) / 60000);
+  const s = Math.floor((diff % 60000) / 1000);
+  document.getElementById("countdown").innerHTML = `
+    <div class="cd-days-line">距考试 <span class="cd-days-num">${d}</span> 天</div>
+    <div class="cd-hms">
+      <div class="cd-block"><div class="cd-num">${String(h).padStart(2,'0')}</div><div class="cd-lbl">时</div></div>
+      <div class="cd-block"><div class="cd-num">${String(m).padStart(2,'0')}</div><div class="cd-lbl">分</div></div>
+      <div class="cd-block"><div class="cd-num">${String(s).padStart(2,'0')}</div><div class="cd-lbl">秒</div></div>
+    </div>
+  `;
+}
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+// === 当前阶段（按日期自动判断） ===
+function currentStage() {
+  const t = new Date();
+  const m = t.getMonth() + 1; // 1..12
+  const d = t.getDate();
+  const md = m * 100 + d; // 707 = 7月7日
+  // 阶段区间（2027 考研倒推）
+  if (md < 701)              return { name: "基础强化", ico: "📘", sub: "" };
+  if (md < 901)              return { name: "暑假强化", ico: "☀️", sub: "7-8月" };
+  if (md < 1101)             return { name: "秋季强化", ico: "🍂", sub: "9-10月" };
+  if (md < 1201)             return { name: "真题冲刺", ico: "🔥", sub: "11月" };
+  if (md <= 1215)            return { name: "模考冲刺", ico: "⚡", sub: "12月上" };
+  return                            { name: "押题背诵", ico: "🎯", sub: "考前" };
+}
+function renderStage() {
+  const st = currentStage();
+  const nameEl = document.getElementById("stageName");
+  const icoEl = document.querySelector("#stagePill .stage-ico");
+  if (!nameEl || !icoEl) return;
+  icoEl.textContent = st.ico;
+  nameEl.innerHTML = st.name + (st.sub ? `<span class="stage-sub">${st.sub}</span>` : "");
+}
+renderStage();
+
+// === 每日寄语（从 /api/quote 拉） ===
+async function loadQuote() {
+  try {
+    const res = await fetch(API + "/quote?t=" + Date.now());
+    const data = await res.json();
+    const card = document.getElementById("quoteCard");
+    const txt = document.getElementById("quoteText");
+    if (!card || !txt) return;
+    if (data.ok && data.text) {
+      txt.textContent = data.text;
+      card.classList.remove("empty");
+    } else {
+      txt.textContent = "今天也稳一点，走过的每一步都算数。";
+      card.classList.add("empty");
+    }
+  } catch (e) {
+    // 静默失败——寄语不影响主流程
+  }
+}
+loadQuote();
+// 每 10 分钟拉一次，防止 cron 换了内容前端看不到
+setInterval(loadQuote, 10 * 60 * 1000);
+
+function switchTab(name) {
+  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("active", b.dataset.tab === name));
+  document.querySelectorAll(".tab-content").forEach(t => t.classList.toggle("active", t.id === "tab-" + name));
+}
+
+function todayKey() {
+  const d = new Date();
+  return `study-tasks-${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function pruneOldTaskState() {
+  // 清掉 v1 遗留（跨天 done 标记），v2 pending 由服务器数据驱动
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith('study-tasks-')) localStorage.removeItem(k);
+  }
+}
+function pendingKey(file, line) { return `${file}#${line}`; }
+
+function toggleTask(el) {
+  const file = el.dataset.file, line = parseInt(el.dataset.line,10), raw = el.dataset.raw;
+  const wasDone = el.classList.contains('done');
+  const nowDone = !wasDone;
+  el.classList.toggle('done', nowDone);
+  el.textContent = nowDone ? '✓' : '';
+  const li = el.closest('li');
+  if (li) li.classList.toggle('is-done', nowDone);
+
+  const pk = pendingKey(file, line);
+  const originalDone = el.dataset.serverDone === "1";
+
+  if (nowDone === originalDone) {
+    // 撤回到服务器状态：从 pending 移除
+    delete pendingMap[pk];
+    el.classList.remove('pending');
+  } else {
+    pendingMap[pk] = { file, line, done: nowDone, expected: raw, ts: Date.now() };
+    el.classList.add('pending');
+  }
+  savePending();
+  renderFab();
+  updateTaskCountBadge();
+
+  if (isAutoOn()) scheduleAutoSync();
+}
+
+// 根据当前 DOM 里的 .task-check 状态刷新 tab 上的 0/37 计数
+function updateTaskCountBadge() {
+  const badge = document.getElementById("tab-count-tasks");
+  if (!badge) return;
+  // 只统计今日任务面板里的 checkbox（复习面板里的也用 task-check，需要排除）
+  const boxes = document.querySelectorAll('#taskList .task-check[data-file]');
+  const total = boxes.length;
+  if (!total) { badge.textContent = "0"; return; }
+  let done = 0;
+  boxes.forEach(el => { if (el.classList.contains('done')) done++; });
+  badge.textContent = `${done}/${total}`;
+}
+
+function scheduleAutoSync() {
+  clearTimeout(autoDebounceT);
+  autoDebounceT = setTimeout(() => {
+    if (pendingCount() > 0 && !syncing && !pullingNow) doSync(true);
+  }, 1500);
+}
+
+function paintPendingMarks() {
+  document.querySelectorAll('.task-check[data-file]').forEach(el => {
+    const pk = pendingKey(el.dataset.file, parseInt(el.dataset.line,10));
+    el.classList.toggle('pending', !!pendingMap[pk]);
+  });
+}
+async function load() {
+  const res = await fetch(API + "/progress");
+  const data = await res.json();
+  if (!data.ok) { document.getElementById("loading").textContent = "加载失败"; return; }
+  allBooks = data.books;
+  await loadBookConfig();
+
+  // Overall stats
+  const total = allBooks.reduce((a,b) => a + b.total, 0);
+  const done = allBooks.reduce((a,b) => a + b.done, 0);
+
+  document.getElementById("overview").innerHTML = `
+    <div class="stat"><div class="val">${done}/${total}</div><div class="lbl">已完成单元</div></div>
+    <div class="stat"><div class="val">${Math.round(done/total*100)}%</div><div class="lbl">总体进度</div></div>
+    <div class="stat"><div class="val">${allBooks.length}</div><div class="lbl">资料数</div></div>
+  `;
+  const progCount = document.getElementById("tab-count-progress");
+  if (progCount) progCount.textContent = `${Math.round(done/total*100)}%`;
+
+  renderTasks();
+  renderReviews();
+  renderProgress();
+  renderFab();
+  pruneOldTaskState();
+  document.getElementById("loading").style.display = "none";
+}
+
+const SUBJECT_STYLES = {
+  "数学二": { icon: "🟥", color: "#a4493d" },
+  "408":    { icon: "🟦", color: "#345f8a" },
+  "英语二": { icon: "🟩", color: "#2f7d57" },
+  "政治":   { icon: "🟨", color: "#b47a29" }
+};
+
+const WEEKDAY_ZH = ["日","一","二","三","四","五","六"];
+
+function fmtDateHuman(iso) {
+  const d = new Date(iso + "T00:00:00");
+  const today = new Date(); today.setHours(0,0,0,0);
+  const diff = Math.round((d - today) / 86400000);
+  const mmdd = `${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const wk = `周${WEEKDAY_ZH[d.getDay()]}`;
+  if (diff === 0) return `今天 ${mmdd} ${wk}`;
+  if (diff === 1) return `明天 ${mmdd} ${wk}`;
+  if (diff === 2) return `后天 ${mmdd} ${wk}`;
+  return `${mmdd} ${wk} · ${diff}天后`;
+}
+
+async function renderReviews() {
+  const res = await fetch(API + "/reviews");
+  const data = await res.json();
+  if (!data.ok) { document.getElementById("reviewList").innerHTML = '<span class="muted">加载失败</span>'; return; }
+
+  const todayCount = data.today.length;
+  const upcomingKeys = Object.keys(data.upcoming).sort();
+  const badge = document.getElementById("tab-count-reviews");
+  if (badge) badge.textContent = todayCount ? String(todayCount) : "0";
+
+  let html = "";
+
+  // ===== 今日必刷 =====
+  if (todayCount === 0) {
+    html += `
+      <div class="review-empty">
+        <div class="review-empty-icon">✨</div>
+        <div>今天没有复习任务</div>
+        <div style="margin-top:6px;font-size:12px">对我说「记入复习：xxx」即可登记</div>
+      </div>`;
+  } else {
+    const overdueCnt = data.today.filter(t => t.overdue).length;
+    html += `<div class="review-section-title ${overdueCnt ? 'overdue' : ''}">
+      🔥 今日必刷 <span class="count-badge">${todayCount}${overdueCnt ? ' · '+overdueCnt+'过期' : ''}</span>
+    </div>`;
+
+    // 按科目分组
+    const grouped = {};
+    for (const item of data.today) {
+      (grouped[item.subject] = grouped[item.subject] || []).push(item);
+    }
+    for (const subj of ["数学二","408","英语二","政治"]) {
+      const items = grouped[subj];
+      if (!items) continue;
+      const s = SUBJECT_STYLES[subj];
+      html += `<div style="margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:${s.color};margin-bottom:8px">${s.icon} ${subj} <span style="color:var(--muted);font-weight:500;font-size:12px">· ${items.length} 条</span></div>
+        <div class="review-grid">`;
+      for (const it of items) {
+        html += renderReviewItem(it);
+      }
+      html += `</div></div>`;
+    }
+  }
+
+  // ===== 未来 7 天 =====
+  if (upcomingKeys.length > 0) {
+    const totalUpcoming = upcomingKeys.reduce((a,k)=>a+data.upcoming[k].length, 0);
+    html += `<div class="review-section-title">📅 未来 7 天 <span class="count-badge" style="background:#345f8a">${totalUpcoming}</span></div>`;
+    for (const k of upcomingKeys) {
+      const items = data.upcoming[k];
+      const highLoad = items.length >= 5;
+      html += `<div class="review-day-header ${highLoad?'high-load':''}" onclick="this.nextElementSibling.classList.toggle('expanded'); this.querySelector('.arrow').textContent = this.nextElementSibling.classList.contains('expanded') ? '▼︎' : '▶︎'">
+        <span style="display:inline-flex;align-items:center;gap:8px"><span class="arrow" style="display:inline-block;width:18px;text-align:center;font-size:11px;color:var(--muted)">▶︎</span>${fmtDateHuman(k)}</span>
+        <span style="font-size:12px;color:var(--muted)">${highLoad?'⚠️ ':''}${items.length} 条</span>
+      </div>
+      <div class="review-day-body">
+        <div class="review-grid">`;
+      for (const it of items) html += renderReviewItem(it, true);
+      html += `</div></div>`;
+    }
+  }
+
+  // ===== 统计 =====
+  html += `<div class="review-stats">
+    <div class="stat-item">📚 <b>${data.stats.active}</b> 活跃</div>
+    <div class="stat-item">✅ <b>${data.stats.mastered}</b> 已掌握</div>
+    <div class="stat-item" style="margin-left:auto;color:var(--muted);font-size:12px">数据源：复习清单.md</div>
+  </div>`;
+
+  document.getElementById("reviewList").innerHTML = html;
+}
+
+function renderReviewItem(it, compact=false) {
+  const s = SUBJECT_STYLES[it.subject] || { icon:"📌", color:"#333" };
+  const overdueTxt = it.overdue ? ` <span style="color:#a4493d;font-weight:700">(过期)</span>` : "";
+  // v2: 用 path_hint（如 "408·计组·中央处理器"）；v1 fallback: book
+  const hint = it.path_hint || it.book || "";
+  const hintTxt = hint ? ` · <span style="color:var(--muted)">${hint}</span>` : "";
+  const weakBadge = it.weak ? ` <span style="background:#fdecc8;color:#a06400;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700">⚠️薄弱</span>` : "";
+  const rolledBadge = (it.rolled && it.rolled > 0) ? ` <span style="background:#fde2d5;color:#a4493d;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700">⏭️延${it.rolled}</span>` : "";
+  const legacyBadge = it.legacy_v1 ? ` <span style="background:#e6e6e6;color:#666;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:700" title="旧格式条目">v1</span>` : "";
+  const doneMarksTxt = (it.done_marks && it.done_marks.length)
+    ? ` · <span style="color:#2f7d57">${it.done_marks.map(m=>`✔${m[0]}`).join(" ")}</span>`
+    : "";
+
+  // === 复习节点计算：当前第几天 / 下一节点距今天数 ===
+  const STAGE_DAYS = { D1:1, D3:3, D7:7, D15:15, D30:30 };
+  const STAGE_SEQ  = ["D1","D3","D7","D15","D30"];
+  const curIdx    = STAGE_SEQ.indexOf(it.stage);
+  const nextStage = curIdx >= 0 ? STAGE_SEQ[curIdx + 1] : null;
+  const stageNo   = curIdx >= 0 ? curIdx + 1 : (it.done_marks ? it.done_marks.length + 1 : 1);
+  const totalNo   = STAGE_SEQ.length;
+
+  // 距当前 due 天数（正数=未来，负数=过期）
+  let daysToCurDue = null, daysSinceSeed = null;
+  if (it.due_date && /^\d{4}-\d{2}-\d{2}$/.test(it.due_date)) {
+    const [yy,mm,dd] = it.due_date.split("-").map(Number);
+    const due = new Date(yy, mm-1, dd);
+    const t   = new Date(); t.setHours(0,0,0,0);
+    daysToCurDue = Math.round((due - t) / 86400000);
+    if (curIdx >= 0) daysSinceSeed = STAGE_DAYS[it.stage] - daysToCurDue;
+  }
+
+  // 展开胶囊内容 & 附加 class
+  let capsuleText = "";
+  let capsuleClass = "";
+  if (it.overdue && daysToCurDue !== null) {
+    capsuleText = `⚠️ 过期 ${-daysToCurDue}天`;
+    capsuleClass = "overdue-hint";
+  } else if (!nextStage) {
+    capsuleText = "最后一次";
+    capsuleClass = "final-hint";
+  } else if (daysToCurDue !== null && daysSinceSeed !== null) {
+    const daysToNext = STAGE_DAYS[nextStage] - daysSinceSeed;
+    if (daysToCurDue === 0) {
+      capsuleText = `今日 ${it.stage}`;
+    } else if (daysToNext <= 0) {
+      capsuleText = `${nextStage} 已到`;
+    } else if (daysToNext === 1) {
+      capsuleText = `明天 ${nextStage}`;
+    } else {
+      capsuleText = `${daysToNext}天后 ${nextStage}`;
+    }
+  } else {
+    capsuleText = nextStage ? `下一 ${nextStage}` : "最后一次";
+  }
+
+  // Stage badge: "D7 · 3/5"（比原来的"第3次"更直观）
+  const stageBadge = `<span class="review-badge-stage ${it.stage}">${it.stage} · ${stageNo}/${totalNo}</span>`;
+
+  // 播种行加"第 N 天"
+  const seedDayTxt = (daysSinceSeed !== null && daysSinceSeed >= 0)
+    ? ` <span style="color:var(--muted)">(第${daysSinceSeed}天)</span>` : "";
+
+  // checkbox
+  let checkbox = "";
+  if (it.file && typeof it.line === "number") {
+    const pk = `${it.file}#${it.line}`;
+    const pend = pendingMap[pk];
+    const displayDone = pend ? pend.done : !!it.checked;
+    checkbox = `<div class="task-check ${displayDone ? 'done' : ''} ${pend ? 'pending' : ''}"
+                     data-file="${it.file}"
+                     data-line="${it.line}"
+                     data-raw="${(it.raw||'').replace(/"/g,'&quot;')}"
+                     data-server-done="${it.checked ? '1' : '0'}"
+                     onclick="event.stopPropagation();toggleTask(this)"
+                     style="margin-top:0;flex-shrink:0">${displayDone ? '✓' : ''}</div>`;
+  }
+
+  // v2: 展示名用 name（知识点纯名字）；v1 fallback: unit_id + title
+  const displayName = it.name || `${it.unit_id||''} ${it.title||''}`.trim();
+
+  // noteId：v2 用 rel_path 生成稳定 id，v1 用 unit_id
+  const idBase = (it.rel_path || `${it.unit_id||'x'}-${it.title||''}`).replace(/[^a-zA-Z0-9]/g, '_').slice(-40);
+  const noteId = `note-${idBase}-${Math.random().toString(36).slice(2,6)}`;
+  const relArg = encodeURIComponent(it.rel_path || '');
+  const noteArgs = `'${noteId}','${relArg}','${encodeURIComponent(it.unit_id||'')}','${encodeURIComponent(it.title||displayName||'')}','${encodeURIComponent(it.book||'')}'`;
+
+  const subjIcon = compact ? `<span style="color:${s.color};margin-right:4px">${s.icon}</span>` : '';
+
+  // 删除按钮（v2 才有，因为需要 rel_path）
+  const removeBtn = it.rel_path
+    ? `<span onclick="event.stopPropagation();removeReview('${it.rel_path.replace(/'/g,"\\'")}','${(it.name||'').replace(/'/g,"\\'")}')" style="cursor:pointer;color:var(--muted);font-size:14px;padding:0 6px" title="移除">×</span>`
+    : '';
+
+  return `<div class="review-item-wrap" id="${noteId}-wrap">
+    <div class="review-item ${it.overdue?'overdue':''}" style="display:flex;align-items:center;gap:10px;padding:10px 12px">
+      ${checkbox}
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="toggleReviewNote(${noteArgs})">
+        <div style="font-weight:600;line-height:1.35;overflow:hidden;text-overflow:ellipsis">
+          ${stageBadge}${subjIcon}<span>${displayName}</span>${overdueTxt}${weakBadge}${rolledBadge}${legacyBadge}
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;overflow:hidden;text-overflow:ellipsis">🌱 ${it.seed_date}${seedDayTxt}${hintTxt}${doneMarksTxt}</div>
+      </div>
+      ${removeBtn}
+      <div id="${noteId}-arrow" class="review-expand-btn ${capsuleClass}" onclick="toggleReviewNote(${noteArgs})">
+        <span class="expand-arrow">▶\uFE0E</span><span>${capsuleText}</span>
+      </div>
+    </div>
+    <div id="${noteId}" style="display:none;margin:6px 0 10px;padding:14px 16px;background:#faf7f2;border-radius:8px;border-left:3px solid ${s.color};font-size:13px;line-height:1.65"></div>
+  </div>`;
+}
+
+// 简易 markdown → HTML（只处理常见语法，避免拉整个库）
+// Markdown → HTML（自研轻量实现，覆盖 Obsidian 常用语法）
+function mdToHtml(md) {
+  if (!md) return '<span style="color:var(--muted)">（无内容）</span>';
+
+  // 归一化行尾（Windows \r\n → \n）
+  md = md.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+  // 0) 抽出数学公式（在代码块之前，避免公式里的 * 被斜体误伤）
+  //    先抽 $$...$$ 块公式，再抽 $...$ 行内。占位符不含 $ 也不含 * _
+  const maths = [];
+  // 块公式 $$...$$（可跨行）
+  md = md.replace(/\$\$([\s\S]+?)\$\$/g, (_, expr) => {
+    const idx = maths.length;
+    maths.push({ display: true, expr });
+    return `\x00MATH${idx}\x00`;
+  });
+  // 行内 $...$（同一行内，不允许换行；两端需紧贴非空白，避免匹配到「$ 100」这种价格）
+  md = md.replace(/(^|[^\\$])\$([^\s$][^$\n]*?[^\s$])\$(?=[^\d]|$)/g, (m, pre, expr) => {
+    const idx = maths.length;
+    maths.push({ display: false, expr });
+    return `${pre}\x00MATH${idx}\x00`;
+  });
+  // 单字符行内 $x$（上面正则要求两端非空白，长度≥2；单字符另处理）
+  md = md.replace(/(^|[^\\$])\$([^\s$])\$(?=[^\d]|$)/g, (m, pre, expr) => {
+    const idx = maths.length;
+    maths.push({ display: false, expr });
+    return `${pre}\x00MATH${idx}\x00`;
+  });
+
+  // 1) 抽出 Mermaid 代码块（在通用代码块抽取之前，否则会被当 code fence 吃掉）
+  //    生成 <div class="mermaid">源码</div>，展开笔记后由 renderMermaidIn() 调用 mermaid 渲染
+  const mermaidBlocks = [];
+  md = md.replace(/```mermaid\s*\n([\s\S]*?)```/g, (_, src) => {
+    const idx = mermaidBlocks.length;
+    mermaidBlocks.push(src);
+    return `\x00MERMAID${idx}\x00`;
+  });
+
+  // 2) 抽出代码块占位（保留原文，最后再插回，避免被其它规则误伤）
+  const codeBlocks = [];
+  md = md.replace(/```([^\n]*)\n([\s\S]*?)```/g, (_, lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push({ lang: lang.trim(), code });
+    return `\x00CODEBLOCK${idx}\x00`;
+  });
+
+  // 2) 抽出行内代码
+  const inlineCodes = [];
+  md = md.replace(/`([^`\n]+)`/g, (_, code) => {
+    const idx = inlineCodes.length;
+    inlineCodes.push(code);
+    return `\x00INLINE${idx}\x00`;
+  });
+
+  // 4) Obsidian Callout（> [!NOTE] Title \n > body）
+  // 在 HTML 转义之前抽出，body 保存原始 markdown，最后递归渲染
+  const callouts = [];
+  md = md.replace(/(^> \[![A-Z]+\][^\n]*(?:\n>[^\n]*)*)/gm, (block) => {
+    const lines = block.split('\n');
+    const first = lines.shift();
+    const m = first.match(/^> \[!([A-Z]+)\]\s*(.*)$/);
+    if (!m) return block;
+    const type = m[1].toLowerCase();
+    const title = m[2] || m[1];
+    const body = lines.map(l => l.replace(/^>\s?/, '')).join('\n');
+    const colors = {
+      note: '#345f8a', tip: '#2f7d57', warning: '#b47a29',
+      error: '#a4493d', example: '#5c4a8f', info: '#345f8a'
+    };
+    const c = colors[type] || '#7a6c4d';
+    const idx = callouts.length;
+    callouts.push({ color: c, title, body });
+    return `\x00CALLOUT${idx}\x00`;
+  });
+
+  // 3) 转义 HTML（此时代码块/行内代码/Callout 已抽出，其它文本可安全转义）
+  let s = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // 5) 表格（| a | b |\n| --- | --- |\n| c | d |）
+  s = s.replace(/(^\|[^\n]+\|\n\|[\s\-:|]+\|\n(?:\|[^\n]+\|\n?)+)/gm, (tbl) => {
+    const rows = tbl.trim().split('\n').filter(r => r.trim().startsWith('|'));
+    if (rows.length < 2) return tbl;
+    const split = r => r.replace(/^\|/, '').replace(/\|$/, '').split('|').map(c => c.trim());
+    const header = split(rows[0]);
+    const body = rows.slice(2).map(split);
+    let html = '<div class="note-table-wrap"><table style="border-collapse:collapse;margin:8px 0;font-size:12.5px;width:100%">';
+    html += '<thead><tr>' + header.map(c => `<th style="border:1px solid #d9c8a3;padding:5px 8px;background:#f0e6cf;text-align:left;font-weight:700">${c}</th>`).join('') + '</tr></thead>';
+    html += '<tbody>' + body.map(row => '<tr>' + row.map(c => `<td style="border:1px solid #d9c8a3;padding:5px 8px;vertical-align:top">${c}</td>`).join('') + '</tr>').join('') + '</tbody>';
+    html += '</table></div>';
+    return '\x00BLOCK\x00' + html + '\x00BLOCK\x00';
+  });
+
+  // 6) 标题
+  s = s.replace(/^###### (.+)$/gm, '<h6 style="margin:8px 0 3px;font-size:12px;color:#7a6c4d">$1</h6>');
+  s = s.replace(/^##### (.+)$/gm, '<h5 style="margin:9px 0 4px;font-size:12.5px;color:#7a6c4d">$1</h5>');
+  s = s.replace(/^#### (.+)$/gm, '<h4 style="margin:10px 0 4px;font-size:13px;color:#a4493d">$1</h4>');
+  s = s.replace(/^### (.+)$/gm, '<h3 style="margin:12px 0 6px;font-size:14px;color:#a4493d">$1</h3>');
+  s = s.replace(/^## (.+)$/gm, '<h2 style="margin:14px 0 8px;font-size:15px;color:#a4493d;border-bottom:1px solid #e0d3ad;padding-bottom:3px">$1</h2>');
+  s = s.replace(/^# (.+)$/gm, '<h1 style="margin:16px 0 10px;font-size:17px;font-weight:800;color:#18211c;border-bottom:2px solid #a4493d;padding-bottom:4px">$1</h1>');
+
+  // 7) Obsidian 双链 [[target|display]] / [[target]]
+  s = s.replace(/\[\[([^\]|]+)\|([^\]]+)\]\]/g, '<span style="color:#345f8a;border-bottom:1px dashed #345f8a;cursor:help" title="Obsidian 双链：$1">$2</span>');
+  s = s.replace(/\[\[([^\]]+)\]\]/g, '<span style="color:#345f8a;border-bottom:1px dashed #345f8a;cursor:help" title="Obsidian 双链">$1</span>');
+
+  // 8) 标签 #foo（避免匹配到标题的 #）
+  s = s.replace(/(^|[^\w#])#([\u4e00-\u9fa5\w][\u4e00-\u9fa5\w/-]{0,30})(?=\s|$)/g,
+    '$1<span style="display:inline-block;background:#eee6d2;color:#7a6c4d;padding:0 6px;border-radius:4px;font-size:11px;margin:0 2px">#$2</span>');
+
+  // 9) 图片 ![](url) & 链接 [](url)
+  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;height:auto;border-radius:4px;margin:4px 0">');
+  s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" style="color:#345f8a;text-decoration:underline">$1</a>');
+
+  // 10) 加粗 / 斜体（斜体避免匹配到 **bold** 中的 *）
+  s = s.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^*\w])\*([^*\n]+)\*(?!\w)/g, '$1<em>$2</em>');
+
+  // 11) 列表（支持嵌套、无序 + 有序，最多 2 层）
+  const lines = s.split('\n');
+  const out = [];
+  let listStack = []; // 每项: { type: 'ul'|'ol', indent: number }
+  const closeListsTo = (indent) => {
+    while (listStack.length && listStack[listStack.length - 1].indent >= indent) {
+      const top = listStack.pop();
+      out.push(top.type === 'ul' ? '</ul>' : '</ol>');
+    }
+  };
+  for (const line of lines) {
+    const um = line.match(/^(\s*)- (.+)$/);
+    const om = line.match(/^(\s*)(\d+)\. (.+)$/);
+    if (um || om) {
+      const indent = (um ? um[1] : om[1]).length;
+      const type = um ? 'ul' : 'ol';
+      const content = um ? um[2] : om[3];
+      // 关掉更深的层
+      while (listStack.length && listStack[listStack.length - 1].indent > indent) {
+        out.push(listStack.pop().type === 'ul' ? '</ul>' : '</ol>');
+      }
+      // 若栈顶同缩进但类型不同，先关掉
+      const top = listStack[listStack.length - 1];
+      if (top && top.indent === indent && top.type !== type) {
+        out.push(top.type === 'ul' ? '</ul>' : '</ol>');
+        listStack.pop();
+      }
+      if (!listStack.length || listStack[listStack.length - 1].indent < indent) {
+        out.push(type === 'ul'
+          ? '<ul style="margin:4px 0;padding-left:22px">'
+          : '<ol style="margin:4px 0;padding-left:22px">');
+        listStack.push({ type, indent });
+      }
+      out.push(`<li>${content}</li>`);
+    } else {
+      if (listStack.length) closeListsTo(-1);
+      out.push(line);
+    }
+  }
+  while (listStack.length) out.push(listStack.pop().type === 'ul' ? '</ul>' : '</ol>');
+  s = out.join('\n');
+
+  // 12) 分割线（--- 单独占一行）
+  s = s.replace(/^---\s*$/gm, '<hr style="border:none;border-top:1px solid #d9c8a3;margin:10px 0">');
+
+  // 13) 段落切分：先按空行分段，段内换行 → <br>；块级元素（h/ul/ol/table/hr）不包 <p>
+  const parts = s.split(/\n\n+/);
+  s = parts.map(part => {
+    const trimmed = part.trim();
+    if (!trimmed) return '';
+    // 块级元素或 CALLOUT/BLOCK 占位符不包 p
+    if (/^\s*<(h[1-6]|ul|ol|hr|table|pre)/i.test(trimmed) || /\x00(BLOCK|CALLOUT\d+|MERMAID\d+)\x00/.test(trimmed)) {
+      return trimmed;
+    }
+    return `<p style="margin:6px 0">${trimmed.replace(/\n/g, '<br>')}</p>`;
+  }).join('\n');
+
+  // 14) 恢复 Callout（递归渲染 body）
+  s = s.replace(/\x00CALLOUT(\d+)\x00/g, (_, i) => {
+    const c = callouts[+i];
+    // 把父层的占位符全部还原成原始 markdown，让递归 mdToHtml 自己重新抽
+    // （避免递归实例的 maths/codeBlocks/inlineCodes 数组为空导致 undefined）
+    let body = c.body;
+    body = body.replace(/\x00MATH(\d+)\x00/g, (_, j) => {
+      const mm = maths[+j];
+      return mm.display ? `$$${mm.expr}$$` : `$${mm.expr}$`;
+    });
+    body = body.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, j) => {
+      const b = codeBlocks[+j];
+      return '```' + (b.lang || '') + '\n' + b.code + '\n```';
+    });
+    body = body.replace(/\x00INLINE(\d+)\x00/g, (_, j) => {
+      return '`' + inlineCodes[+j] + '`';
+    });
+    const inner = mdToHtml(body);
+    // callout title 需要转义
+    const safeTitle = c.title.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div style="border-left:3px solid ${c.color};background:${c.color}0f;padding:8px 12px;margin:8px 0;border-radius:0 6px 6px 0">
+      <div style="color:${c.color};font-weight:700;font-size:12px;margin-bottom:4px">${safeTitle}</div>
+      <div>${inner}</div>
+    </div>`;
+  });
+
+  // 15) 去掉 BLOCK 标记
+  s = s.replace(/\x00BLOCK\x00/g, '');
+
+  // 16) 恢复代码块 & 行内代码
+  s = s.replace(/\x00CODEBLOCK(\d+)\x00/g, (_, i) => {
+    const b = codeBlocks[+i];
+    const escaped = b.code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<pre style="background:#f3ede2;padding:10px 12px;border-radius:6px;overflow-x:auto;font-size:12px;line-height:1.5;margin:8px 0"><code>${escaped}</code></pre>`;
+  });
+  s = s.replace(/\x00INLINE(\d+)\x00/g, (_, i) => {
+    const code = inlineCodes[+i].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<code style="background:#f3ede2;padding:1px 5px;border-radius:3px;font-size:12px;font-family:ui-monospace,Menlo,Consolas,monospace">${code}</code>`;
+  });
+
+  // 17) 恢复数学公式（KaTeX 渲染；失败降级为原文 $...$ 灰底展示）
+  s = s.replace(/\x00MATH(\d+)\x00/g, (_, i) => {
+    const m = maths[+i];
+    if (typeof katex === 'undefined') {
+      // KaTeX 未加载时降级
+      const raw = m.expr.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return m.display
+        ? `<div style="background:#fdecc8;color:#a06400;padding:6px 10px;border-radius:4px;font-family:ui-monospace,Menlo,monospace;font-size:12px;margin:6px 0">$$${raw}$$ <span style="font-size:10px">(KaTeX 加载中)</span></div>`
+        : `<code style="background:#fdecc8;color:#a06400;padding:1px 5px;border-radius:3px;font-size:12px;font-family:ui-monospace,Menlo,monospace">$${raw}$</code>`;
+    }
+    try {
+      return katex.renderToString(m.expr, {
+        displayMode: m.display,
+        throwOnError: false,
+        errorColor: '#a4493d',
+        strict: 'ignore',
+        trust: false,
+      });
+    } catch (e) {
+      const raw = m.expr.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return `<span style="color:#a4493d;background:#fef4f2;padding:1px 5px;border-radius:3px;font-family:ui-monospace,monospace;font-size:12px" title="${e.message||e}">⚠️ ${m.display?'$$':'$'}${raw}${m.display?'$$':'$'}</span>`;
+    }
+  });
+
+  // 18) 恢复 Mermaid 块（不预转义 --> 等 mermaid 语法，但要转义 HTML 特殊字符 < > &；
+  //     mermaid 读节点 textContent 时浏览器会自动 decode 实体，源码语义不变）
+  //     data-mermaid-src 存原始源码作为备份（若首次渲染失败可复用）
+  //     渲染由 renderMermaidIn() 在展开笔记后调用（见 toggleReviewNote/mdToHtml 调用处）
+  s = s.replace(/\x00MERMAID(\d+)\x00/g, (_, i) => {
+    const src = mermaidBlocks[+i];
+    const escaped = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const attr = src.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<div class="mermaid-wrap" style="margin:10px 0;text-align:center;background:#fbf6ec;border:1px solid #e0d3ad;border-radius:6px;padding:10px;overflow-x:auto"><div class="mermaid" data-mermaid-src="${attr}">${escaped}</div></div>`;
+  });
+
+  return s;
+}
+
+// 懒加载章节笔记
+const reviewNoteCache = {};
+
+// Mermaid 渲染：扫容器内所有 .mermaid，如果还没渲染（没 data-processed）就调 mermaid.run。
+// 每张图独立 try/catch——一张挂了不阻塞其它图；失败时恢复源码 + 灰底提示。
+async function renderMermaidIn(container) {
+  if (!container || typeof mermaid === 'undefined') return;
+  const nodes = container.querySelectorAll('.mermaid:not([data-processed="true"])');
+  if (!nodes.length) return;
+  for (const node of nodes) {
+    try {
+      // 缓存 HTML 复用时 innerHTML 可能已是 <svg>——mermaid 会跳过（认 data-processed）
+      // 但为保险显式检查
+      if (node.getAttribute('data-processed') === 'true') continue;
+      // 恢复源码到 textContent（避免上次失败留下的杂 HTML）
+      const src = node.getAttribute('data-mermaid-src') || node.textContent;
+      // 生成一个 id 避免 mermaid 内部冲突
+      const id = 'mmd-' + Math.random().toString(36).slice(2, 10);
+      const { svg } = await mermaid.render(id, src);
+      node.innerHTML = svg;
+      node.setAttribute('data-processed', 'true');
+    } catch (e) {
+      console.warn('[mermaid] render failed:', e);
+      const src = node.getAttribute('data-mermaid-src') || node.textContent || '';
+      const raw = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      node.innerHTML = `<div style="text-align:left;color:#a4493d;background:#fef4f2;padding:8px 10px;border-radius:4px;font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap">⚠️ Mermaid 渲染失败：${(e.message||e).toString().split('\n')[0]}\n\n<span style="color:#66736b">源码：</span>\n${raw}</div>`;
+      node.setAttribute('data-processed', 'true');
+    }
+  }
+  // Mermaid 渲染完后 scrollHeight 变化，重测 clip
+  const clipEl = container.querySelector('.note-clip');
+  const btnEl = container.querySelector('.note-expand-btn');
+  if (clipEl && btnEl && clipEl.id && btnEl.id) {
+    _applyNoteClip(clipEl.id, btnEl.id);
+  }
+}
+
+// 测量笔记内容，决定是否折叠+显示"展开全部"按钮
+function _applyNoteClip(clipId, btnId) {
+  requestAnimationFrame(() => {
+    const clip = document.getElementById(clipId);
+    const btn = document.getElementById(btnId);
+    if (!clip || !btn) return;
+    // 先假设需要折叠时的状态还原为未定，测真实内容高度
+    clip.classList.remove('clipped');
+    const fullH = clip.scrollHeight;
+    if (fullH > 400) {
+      clip.classList.add('clipped');
+      btn.style.display = 'block';
+      btn.textContent = '展开全部 ▼';
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+}
+function expandNoteClip(clipId, btnId) {
+  const clip = document.getElementById(clipId);
+  const btn = document.getElementById(btnId);
+  if (!clip || !btn) return;
+  const isClipped = clip.classList.contains('clipped');
+  if (isClipped) {
+    clip.classList.remove('clipped');
+    btn.textContent = '收起 ▲';
+  } else {
+    clip.classList.add('clipped');
+    btn.textContent = '展开全部 ▼';
+    // 收起时把视口拉回按钮附近，避免用户被"甩"到卡片底部下方
+    btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+}
+async function toggleReviewNote(noteId, rel_path, unit_id, title, book) {
+  const box = document.getElementById(noteId);
+  const arrow = document.getElementById(noteId + "-arrow");
+  if (!box) return;
+  const isOpen = box.style.display !== "none";
+  const wrap = document.getElementById(noteId + "-wrap");
+  if (isOpen) {
+    box.style.display = "none";
+    if (arrow) arrow.classList.remove("open");
+    if (wrap) wrap.classList.remove("expanded");
+    return;
+  }
+  box.style.display = "block";
+  if (arrow) arrow.classList.add("open");
+  if (wrap) wrap.classList.add("expanded");
+  const cacheKey = `${rel_path}|${unit_id}|${title}|${book}`;
+  if (reviewNoteCache[cacheKey]) {
+    box.innerHTML = reviewNoteCache[cacheKey];
+    // 从缓存 HTML 里挖出 clipId/btnId 重新测量（因为 clip 类和按钮可见性依赖当前 DOM 尺寸）
+    const clipEl = box.querySelector('.note-clip');
+    const btnEl = box.querySelector('.note-expand-btn');
+    if (clipEl && btnEl && clipEl.id && btnEl.id) {
+      _applyNoteClip(clipEl.id, btnEl.id);
+    }
+    renderMermaidIn(box);  // 缓存复用的 HTML 里 .mermaid 已有 data-processed 会自动跳过；否则重渲
+    return;
+  }
+  box.innerHTML = '<span style="color:var(--muted)">加载中…</span>';
+  try {
+    // 优先用 rel_path 直连（v2）
+    const rp = decodeURIComponent(rel_path || "");
+    const url = rp
+      ? `${API}/review-note?rel_path=${encodeURIComponent(rp)}`
+      : `${API}/review-note?unit_id=${unit_id}&title=${title}&book=${book}`;
+    const r = await fetch(url);
+    const d = await r.json();
+    if (!d.ok) {
+      box.innerHTML = `<span style="color:#a4493d">未找到笔记：${d.reason || '未知'}</span>`;
+      return;
+    }
+    const fileName = (d.file||'').split('/').pop();
+    const matchTag = d.precision === "rel_path_direct"
+      ? `<span style="background:#d4e9d9;color:#2f7d57;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600">✓ 直连</span>`
+      : (d.matched
+          ? `<span style="background:#d4e9d9;color:#2f7d57;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600">✓ 精准</span>`
+          : `<span style="background:#fdecc8;color:#a06400;padding:1px 6px;border-radius:4px;font-size:11px;font-weight:600">≈ 章节兜底</span>`);
+    const clipId = `${noteId}-clip`;
+    const btnId = `${noteId}-btn`;
+    const html = `
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px">
+        📄 ${fileName} · <span style="color:#a4493d;font-weight:600">${d.heading||''}</span> ${matchTag}
+      </div>
+      <div id="${clipId}" class="note-clip clipped">${mdToHtml(d.body||'')}</div>
+      <button id="${btnId}" class="note-expand-btn" style="display:none" onclick="expandNoteClip('${clipId}','${btnId}')">展开全部 ▼</button>
+    `;
+    reviewNoteCache[cacheKey] = html;
+    box.innerHTML = html;
+    _applyNoteClip(clipId, btnId);
+    renderMermaidIn(box);
+  } catch (e) {
+    box.innerHTML = `<span style="color:#a4493d">加载失败：${e.message}</span>`;
+  }
+}
+
+async function renderTasks() {
+  const res = await fetch(API + "/today-tasks");
+  const data = await res.json();
+  if (!data.ok) {
+    document.getElementById("taskList").innerHTML = '<span class="muted">加载失败</span>';
+    return;
+  }
+
+  // 教材短名映射（看板上书名过长会被 ellipsis 掉，短名保留识别度）
+  const BOOK_SHORT = {
+    '王道操作系统': '王道OS',
+    '王道计算机组成原理': '王道计组',
+    '王道数据结构复习指导书': '王道DS',
+    '王道计算机网络': '王道计网',
+    '武忠祥高等数学辅导讲义强化篇': '武强化',
+    '武忠祥高等数学辅导讲义配套严选题': '武强化·严选',
+    '武忠祥-高数基础篇': '武基础',
+    '武忠祥-高等数学基础篇严选题': '武基础·严选',
+    '李永乐线性代数辅导讲义': '李线代',
+    '李永乐线性代数辅导讲义配套严选题': '李线代·严选',
+    '李永乐-线性代数基础篇': '李线代基础',
+    '基础过关660-高数篇': '660·高数',
+    '基础过关660-线代篇': '660·线代',
+    '李林-880题-数一': '李林880',
+    '数一-330题': '数一330',
+    '图灵1800-选择题专项': '图灵1800',
+    '刘晓艳-58篇基础阅读': '58篇阅读',
+    '刘晓艳-88句': '88句',
+    '刘晓艳-考研英语核心词': '核心词',
+    '英语红宝书2027': '红宝书',
+    '政治核心考案-徐涛': '徐涛核心',
+    '肖1000-试题分册': '肖1000',
+  };
+  const shortBookName = (name) => BOOK_SHORT[name] || name;
+
+  // 从 chapter 字段抽取 tag 短文本
+  //   跨科目书（chapter 以 SUBJECT_TAG 里的科目名开头）→ "科目缩写·第N章"
+  //     "数据结构 第1章 绪论"          → "DS·第1章"
+  //     "计算机组成原理 第2章 数据表示" → "计组·第2章"
+  //     "操作系统 第3章 内存管理"      → "OS·第3章"
+  //     "计算机网络 第4章 网络层"      → "计网·第4章"
+  //   无科目前缀（王道单科书）→ "第N章"
+  //     "第3章 内存管理"               → "第3章"
+  //   兜底：整个 chapter 原文（CSS 不截断）
+  //   空 → ""
+  const SUBJECT_TAG = {
+    '数据结构': 'DS',
+    '计算机组成原理': '计组',
+    '操作系统': 'OS',
+    '计算机网络': '计网',
+  };
+  const chapterTag = (ch) => {
+    if (!ch) return "";
+    const first = ch.split(/\s+/)[0];
+    const chapM = ch.match(/第[0-9零一二三四五六七八九十百]+[章节部单元]/);
+    if (SUBJECT_TAG[first]) {
+      return chapM ? `${SUBJECT_TAG[first]}·${chapM[0]}` : SUBJECT_TAG[first];
+    }
+    if (chapM) return chapM[0];
+    return ch;
+  };
+
+  const subjectStyles = {
+    "数学二": { icon: "🔴", color: "#a4493d", bg: "linear-gradient(135deg, #fbe9e6 0%, #f5d8d2 100%)" },
+    "408":    { icon: "🔵", color: "#345f8a", bg: "linear-gradient(135deg, #e6eef8 0%, #d1dff0 100%)" },
+    "英语二": { icon: "🟢", color: "#2f7d57", bg: "linear-gradient(135deg, #e5f0e8 0%, #cde3d3 100%)" },
+    "政治":   { icon: "🟡", color: "#b47a29", bg: "linear-gradient(135deg, #faf1dc 0%, #f2e2b8 100%)" }
+  };
+  const subjectOrder = ["数学二", "408", "英语二", "政治"];
+
+  // 建索引：progress 里所有教材按 subject 分组（含未开始的）
+  const booksBySubject = {};
+  for (const b of (allBooks || [])) {
+    (booksBySubject[b.subject] = booksBySubject[b.subject] || []).push(b);
+  }
+
+  // 从 file 路径抽出进度文件名（不含扩展名），用于匹配 allBooks[i].name
+  const fileToBookName = (f) => {
+    if (!f) return "";
+    const m = f.match(/\/进度\/([^/]+)\.md$/);
+    return m ? m[1] : "";
+  };
+
+  let html = "";
+  let totalTasks = 0, doneTasks = 0;
+
+  for (const subject of subjectOrder) {
+    const tasks = (data.tasks || {})[subject] || [];
+    const allSubjectBooks = booksBySubject[subject] || [];
+    const s = subjectStyles[subject] || { icon: "📌", color: "#333", bg: "#fff" };
+
+    totalTasks += tasks.length;
+    doneTasks += tasks.filter(t => t.done).length;
+
+    // 今日任务按教材分组（保持原顺序）
+    const bookGroups = [];
+    const bookIndex = {};
+    tasks.forEach((t, i) => {
+      const bookKey = fileToBookName(t.file) || t.book_name || t.book || "未分组";
+      const bookLabel = t.book_name || t.book || bookKey;
+      if (!(bookKey in bookIndex)) {
+        bookIndex[bookKey] = bookGroups.length;
+        bookGroups.push({ book: bookLabel, key: bookKey, items: [] });
+      }
+      bookGroups[bookIndex[bookKey]].items.push({ ...t, _origIdx: i });
+    });
+
+    // 科目总进度基于 progress（所有教材）
+    const subTotal = allSubjectBooks.reduce((a,b)=>a+b.total, 0);
+    const subDone  = allSubjectBooks.reduce((a,b)=>a+b.done, 0);
+
+    // === 今日任务区 ===
+    let todaySection = "";
+    if (bookGroups.length === 0) {
+      todaySection = `<div class="subject-empty-today">今日无任务</div>`;
+    } else {
+      todaySection = bookGroups.map((g, gIdx) => {
+        const gDone = g.items.filter(t=>t.done).length;
+        const collapsed = (bookGroups.length > 1 && gIdx > 0) ? 'collapsed' : '';
+        return `
+          <div class="book-group ${collapsed}" style="margin-bottom:10px">
+            <div class="book-group-title" onclick="this.parentElement.classList.toggle('collapsed')" style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:${s.color};padding:5px 8px;background:${s.bg};border-radius:5px;margin-bottom:4px">
+              <span class="book-toggle">▼</span>
+              <span style="opacity:.75;font-size:11px">📖</span>
+              <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${g.book}">${shortBookName(g.book)}</span>
+              <span style="font-size:10px;color:var(--muted);font-weight:600">${gDone}/${g.items.length}</span>
+            </div>
+            <ul class="task-list" style="margin:0;padding-left:2px">
+              ${g.items.map(t => {
+                const pk = `${t.file}#${t.line}`;
+                const pend = pendingMap[pk];
+                const displayDone = pend ? pend.done : t.done;
+                const chTag = chapterTag(t.chapter || '');
+                const chTagHtml = chTag
+                  ? `<span class="task-chapter-tag" title="${(t.chapter||'').replace(/"/g,'&quot;')}">${chTag}</span>`
+                  : '';
+                const displayTitle = t.title_short || t.title;
+                return `
+                <li class="${displayDone ? 'is-done' : ''}" style="padding:8px 0;gap:8px">
+                  <div class="task-check ${displayDone ? 'done' : ''} ${pend ? 'pending' : ''}"
+                       data-key="${subject}-${t._origIdx}"
+                       data-file="${t.file}"
+                       data-line="${t.line}"
+                       data-raw="${(t.raw||'').replace(/"/g,'&quot;')}"
+                       data-server-done="${t.done ? '1' : '0'}"
+                       onclick="toggleTask(this)">${displayDone ? '✓' : ''}</div>
+                  <div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px">
+                    <div class="task-title" style="flex:1;min-width:0;font-weight:500;line-height:1.35;font-size:13px;word-break:break-word">${displayTitle}</div>
+                    ${chTagHtml}
+                  </div>
+                </li>
+              `;}).join("")}
+            </ul>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // === 全部教材区（含激活开关：看板自管理）===
+    const todayBookKeys = new Set(bookGroups.map(g => g.key));
+    const activeCfg = bookConfig.active || {};
+    let allBooksSection = "";
+    if (allSubjectBooks.length === 0) {
+      allBooksSection = `<div class="subject-empty-today">暂无教材</div>`;
+    } else {
+      const enriched = allSubjectBooks.map(b => {
+        const isDone = b.done >= b.total && b.total > 0;
+        const isActive = b.name in activeCfg;
+        let state;
+        if (isDone) state = 'done';
+        else if (isActive) state = 'doing';
+        else state = 'todo';
+        return { ...b, state, isDone, isActive, inToday: todayBookKeys.has(b.name) };
+      });
+      // 排序：今日 → 激活中 → 未激活 → 已完成
+      const stateRank = (b) => b.inToday ? 0 : (b.isActive ? 1 : (b.isDone ? 3 : 2));
+      enriched.sort((a,b) => stateRank(a) - stateRank(b));
+
+      allBooksSection = `<div class="book-status-list">` + enriched.map(b => {
+        const icon = b.isDone ? '✅' : (b.inToday ? '🔥' : (b.isActive ? '🔄' : '○'));
+        const pct = b.total > 0 ? Math.round(b.done / b.total * 100) : 0;
+        const canToggle = !b.isDone;
+        const nextActive = !b.isActive;
+        const btnLabel = b.isActive ? '✓ 已加入' : '+ 加入';
+        const btnStyle = b.isActive
+          ? `background:${s.color};color:#fff;border-color:${s.color}`
+          : `background:transparent;color:${s.color};border-color:${s.color}`;
+        const btn = canToggle
+          ? `<button class="book-toggle-btn" data-book-toggle="${b.name}"
+              onclick='toggleBookActive(${JSON.stringify(b.name)}, ${nextActive}, 5)'
+              style="${btnStyle};font-size:12px;padding:0 8px;height:20px;line-height:18px;border:1px solid;border-radius:10px;cursor:pointer;flex-shrink:0;font-weight:600;display:inline-flex;align-items:center;">${btnLabel}</button>`
+          : '';
+        return `<div class="book-status-row bs-${b.state}" style="${b.state==='doing' ? `color:${s.color}` : ''}">
+          <span class="bs-icon">${icon}</span>
+          <span class="bs-name" title="${b.name}">${shortBookName(b.name)}</span>
+          <span class="bs-mini-bar"><i style="width:${pct}%"></i></span>
+          <span class="bs-count">${b.done}/${b.total}</span>
+          ${btn}
+        </div>`;
+      }).join("") + `</div>`;
+    }
+
+    html += `
+      <div class="task-card" style="border-left:4px solid ${s.color}">
+        <h3 style="margin:0 0 10px 0;color:${s.color};display:flex;align-items:center;gap:6px;font-size:15px">
+          <span style="font-size:18px">${s.icon}</span>${subject}
+          <span class="subject-progress-hero">
+            <span class="hero-done" style="color:${s.color}">${subDone}</span><span class="hero-sep">/</span><span class="hero-total">${subTotal}</span>
+          </span>
+        </h3>
+        <div class="subject-section-label">🎯 今日任务 <span style="color:${s.color};font-weight:700">${tasks.filter(t=>t.done).length}/${tasks.length||0}</span></div>
+        ${todaySection}
+        <div class="all-books-wrap collapsed">
+          <div class="subject-section-label toggle" onclick="(function(el){const w=el.parentElement;w.classList.toggle('collapsed');const a=el.querySelector('.section-arrow');if(a)a.textContent=(w.classList.contains('collapsed')?'▶':'▼')+'\uFE0E';})(this)">
+            <span class="section-arrow">▶\uFE0E</span>
+            📚 全部教材 <span style="color:var(--muted);font-weight:600">${allSubjectBooks.length}本</span>
+          </div>
+          ${allBooksSection}
+        </div>
+      </div>
+    `;
+  }
+
+  // Update tab count
+  const countEl = document.getElementById("tab-count-tasks");
+  if (countEl) countEl.textContent = totalTasks ? `${doneTasks}/${totalTasks}` : "0";
+
+  if (data.date) {
+    html = `<div class="task-date-row" style="margin-bottom:4px;color:var(--muted);font-size:13px">📅 ${data.date}</div>` + html;
+  }
+
+  document.getElementById("taskList").innerHTML = html || '<div style="text-align:center;padding:40px;color:var(--muted)"><div style="font-size:48px">🎉</div><div style="margin-top:12px">所有任务已完成，休息一下吧</div></div>';
+  paintPendingMarks();
+  renderFab();
+}
+
+function renderProgress() {
+  const subjects = {};
+  for (const b of allBooks) {
+    const s = b.subject;
+    subjects[s] = subjects[s] || { total:0, done:0, books:[] };
+    subjects[s].total += b.total;
+    subjects[s].done += b.done;
+    subjects[s].books.push(b);
+  }
+
+  const order = ["数学二", "408", "英语二", "政治", "其他"];
+  let html = '<div class="subject-grid">';
+  for (const subj of order) {
+    const s = subjects[subj];
+    if (!s) continue;
+    const pct = Math.round(s.done / s.total * 100);
+    html += `<div class="subject-card">
+      <h2>${subj} <span class="pill ${pct>=80?'green':''}">${s.done}/${s.total} · ${pct}%</span></h2>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="books-grid">`;
+    for (const b of s.books) {
+      html += `<div class="book">
+        <h3>${b.name} <span class="muted">${b.done}/${b.total}</span></h3>
+        <div class="bar"><i style="width:${b.pct}%"></i></div>
+        <div class="chapters">`;
+      for (const c of b.chapters) {
+        html += `<div class="chapter-dot ${c.done?'done':''}" data-title="${c.id} ${c.title}" title="${c.id} ${c.title}${c.page?' ('+c.page+')':''}${c.date?' ✅'+c.date:''}"></div>`;
+      }
+      html += `</div></div>`;
+    }
+    html += '</div></div>';
+  }
+  html += '</div>';
+  document.getElementById("subjects").innerHTML = html;
+}
+
+// ====== 同步 / 拉取 ======
+
+async function doSync(isAuto=false) {
+  if (syncing) return;
+  if (pendingCount() === 0) { if (!isAuto) toast("没有待同步的改动"); return; }
+  syncing = true;
+  setFabStatus("同步中…", "spin");
+  document.getElementById("syncBtn").disabled = true;
+  document.getElementById("pullBtn").disabled = true;
+
+  const changes = Object.values(pendingMap);
+  try {
+    const r = await fetch(API + "/sync-tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Token": API_TOKEN },
+      body: JSON.stringify({ changes })
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) {
+      autoSyncFails++;
+      const msg = "同步失败：" + (data.error || r.status);
+      toast(msg, "err");
+      setFabStatus("❌ 同步失败", "err");
+      if (isAuto && autoSyncFails >= 3) {
+        alert(`自动同步已失败 ${autoSyncFails} 次，请检查网络或点击查看日志\n最近错误：${msg}`);
+      }
+    } else {
+      autoSyncFails = 0;
+      // 清理已成功的 pending（有冲突的保留）
+      const conflictKeys = new Set((data.conflicts||[]).map(c => `${c.file}#${c.line}`));
+      for (const k of Object.keys(pendingMap)) {
+        if (!conflictKeys.has(k)) delete pendingMap[k];
+      }
+      savePending();
+
+      if (data.conflicts && data.conflicts.length) {
+        toast(`已同步 ${data.applied} 条，${data.conflicts.length} 条冲突（手机端已改）`, "err");
+      } else {
+        toast(`已同步 ${data.applied} 条 ✅`, "ok");
+      }
+      // 重新拉数据反映真实状态
+      await refreshData();
+    }
+  } catch (e) {
+    autoSyncFails++;
+    toast("网络错误：" + e.message, "err");
+    setFabStatus("❌ 网络错误", "err");
+    if (isAuto && autoSyncFails >= 3) {
+      alert(`自动同步网络错误 ${autoSyncFails} 次：${e.message}`);
+    }
+    // 网络错误：服务端可能已完成，拉一次看看真实状态（幂等回放会在下次同步清 pending）
+    try { await refreshData(); } catch(_) {}
+  } finally {
+    syncing = false;
+    document.getElementById("syncBtn").disabled = false;
+    document.getElementById("pullBtn").disabled = false;
+    renderFab();
+  }
+}
+
+async function doPull() {
+  if (pullingNow || syncing) return;
+  pullingNow = true;
+  setFabStatus("拉取中…", "spin");
+  document.getElementById("pullBtn").disabled = true;
+  document.getElementById("syncBtn").disabled = true;
+  try {
+    const r = await fetch(API + "/pull", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Token": API_TOKEN },
+      body: "{}"
+    });
+    const data = await r.json();
+    if (!r.ok || !data.ok) {
+      toast("拉取失败 rc=" + (data.rc ?? r.status), "err");
+    } else {
+      toast("已从 OSS 拉取最新 ⬇️", "ok");
+      await refreshData();
+    }
+  } catch (e) {
+    toast("拉取错误：" + e.message, "err");
+  } finally {
+    pullingNow = false;
+    document.getElementById("pullBtn").disabled = false;
+    document.getElementById("syncBtn").disabled = false;
+    renderFab();
+  }
+}
+
+async function refreshData() {
+  // 重新载入 progress + tasks + reviews + book-config
+  const res = await fetch(API + "/progress");
+  const data = await res.json();
+  if (data.ok) allBooks = data.books;
+  await loadBookConfig();
+  await renderTasks();
+  renderReviews();
+  renderProgress();
+  renderFab();
+}
+
+// 切 tab 离开/回来时如果有 pending 且开启自动同步 → 触发
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && isAutoOn() && pendingCount() > 0 && !syncing) {
+    doSync(true);
+  }
+});
+// 60s 兜底
+setInterval(() => {
+  if (isAutoOn() && pendingCount() > 0 && !syncing && !pullingNow) {
+    doSync(true);
+  }
+}, 60000);
+
+load();
+// ========== 登记复习 modal ==========
+
+let _kpSearchTimer = null;
+let _kpAllCache = null;
+let _kpAllCacheTs = 0;
+
+async function openAddReviewModal() {
+  const modal = document.getElementById("addReviewModal");
+  modal.style.display = "flex";
+  document.getElementById("kpSearchInput").value = "";
+  document.getElementById("kpSubjectFilter").value = "";
+  document.getElementById("kpWeakToggle").checked = false;
+  document.getElementById("kpResults").innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">加载中…</div>';
+  setTimeout(() => document.getElementById("kpSearchInput").focus(), 50);
+  await refreshKpList();
+}
+
+function closeAddReviewModal() {
+  document.getElementById("addReviewModal").style.display = "none";
+}
+
+async function refreshKpList() {
+  const q = document.getElementById("kpSearchInput").value.trim();
+  const subj = document.getElementById("kpSubjectFilter").value;
+  const box = document.getElementById("kpResults");
+
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (subj) params.set("subject", subj);
+  params.set("limit", "80");
+
+  try {
+    const r = await fetch(`${API}/knowledge-points?${params.toString()}`);
+    const d = await r.json();
+    if (!d.ok) { box.innerHTML = '<div style="color:#a4493d;padding:10px">加载失败</div>'; return; }
+    if (!d.items.length) {
+      box.innerHTML = `<div style="padding:24px;text-align:center;color:var(--muted)">
+        <div style="font-size:24px;margin-bottom:8px">🔍</div>
+        <div>没找到匹配的知识点</div>
+        <div style="font-size:12px;margin-top:6px">支持子串或拼音首字母（如 zllsx）</div>
+      </div>`;
+      return;
+    }
+    const rows = d.items.map(kp => renderKpRow(kp)).join("");
+    box.innerHTML = rows;
+  } catch (e) {
+    box.innerHTML = `<div style="color:#a4493d;padding:10px">网络错误: ${e}</div>`;
+  }
+}
+
+const KP_SUBJECT_ICONS = { "数学": "🟥", "408": "🟦", "英语": "🟩", "政治": "🟨" };
+
+function renderKpRow(kp) {
+  const icon = KP_SUBJECT_ICONS[kp.subject] || "📄";
+  const badge = kp.in_review
+    ? `<span style="background:#e6e6e6;color:#666;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">已登记</span>`
+    : `<button onclick='addReviewFromModal(${JSON.stringify(kp.rel_path)})' style="background:#3a6b47;color:#fff;border:none;padding:4px 12px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">+ 登记</button>`;
+  return `<div class="kp-row" style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-bottom:1px solid #eee5d3">
+    <div style="flex:1;min-width:0">
+      <div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${icon} ${kp.name}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${kp.path_hint}</div>
+    </div>
+    ${badge}
+  </div>`;
+}
+
+async function addReviewFromModal(rel_path) {
+  const weak = document.getElementById("kpWeakToggle").checked;
+  const btnBox = event.target;
+  btnBox.disabled = true;
+  btnBox.textContent = "登记中…";
+  try {
+    const r = await fetch(`${API}/reviews/add`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Token": API_TOKEN },
+      body: JSON.stringify({ rel_path, weak }),
+    });
+    const d = await r.json();
+    if (!d.ok) {
+      alert("登记失败：" + (d.error || "未知错误") + (d.existing ? `\n已存在: ${d.existing.name} [${d.existing.current}]` : ""));
+      btnBox.disabled = false;
+      btnBox.textContent = "+ 登记";
+      return;
+    }
+    // 局部刷新这一行
+    const row = btnBox.closest(".kp-row");
+    if (row) {
+      const cell = btnBox.parentNode;
+      btnBox.remove();
+      cell.insertAdjacentHTML("beforeend",
+        `<span style="background:#e6e6e6;color:#666;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">已登记</span>`);
+    }
+    // 刷新主列表
+    renderReviews();
+  } catch (e) {
+    alert("网络错误: " + e);
+    btnBox.disabled = false;
+    btnBox.textContent = "+ 登记";
+  }
+}
+
+function bindKpSearchInput() {
+  const input = document.getElementById("kpSearchInput");
+  input.addEventListener("input", () => {
+    clearTimeout(_kpSearchTimer);
+    _kpSearchTimer = setTimeout(refreshKpList, 200);
+  });
+  document.getElementById("kpSubjectFilter").addEventListener("change", refreshKpList);
+}
+
+async function removeReview(rel_path, name) {
+  if (!confirm(`确定移除「${name}」？\n（不影响归档区历史条目）`)) return;
+  try {
+    const r = await fetch(`${API}/reviews/remove`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Token": API_TOKEN },
+      body: JSON.stringify({ rel_path }),
+    });
+    const d = await r.json();
+    if (!d.ok) { alert("移除失败: " + (d.error || "未知")); return; }
+    renderReviews();
+  } catch (e) {
+    alert("网络错误: " + e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (document.getElementById("kpSearchInput")) bindKpSearchInput();
+});
+
+</script>
+
+<!-- ========== 登记复习 modal ========== -->
+<div id="addReviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:flex-start;justify-content:center;padding-top:6vh" onclick="if(event.target===this)closeAddReviewModal()">
+  <div style="background:#faf7f2;border-radius:12px;width:min(560px,92vw);max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:1px solid #eee5d3;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:16px;font-weight:700">➕ 登记复习</div>
+      <span onclick="closeAddReviewModal()" style="cursor:pointer;font-size:22px;color:var(--muted);line-height:1">×</span>
+    </div>
+    <div style="padding:12px 20px;border-bottom:1px solid #eee5d3;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input id="kpSearchInput" type="text" placeholder="搜索知识点名 / 拼音首字母（如 zllsx）" autocomplete="off"
+             style="flex:1;min-width:200px;padding:8px 12px;border:1px solid #d9cfba;border-radius:8px;font-size:14px;background:#fff">
+      <select id="kpSubjectFilter" style="padding:8px 10px;border:1px solid #d9cfba;border-radius:8px;background:#fff;font-size:13px">
+        <option value="">全部科目</option>
+        <option value="数学">🟥 数学</option>
+        <option value="408">🟦 408</option>
+        <option value="英语">🟩 英语</option>
+        <option value="政治">🟨 政治</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);white-space:nowrap">
+        <input id="kpWeakToggle" type="checkbox"> 薄弱
+      </label>
+    </div>
+    <div id="kpResults" style="flex:1;overflow-y:auto;padding:4px 8px"></div>
+    <div style="padding:8px 20px;border-top:1px solid #eee5d3;font-size:11px;color:var(--muted);text-align:center">
+      支持模糊搜索：子串（"流水线"）或拼音首字母（"zllsx"）
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
